@@ -1,0 +1,33 @@
+## Ignore Visual Studio temporary files, build output, and user settings
+
+# Visual Studio working directory
+.vs/
+*/.vs/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+*/[Bb]in/
+[Oo]bj/
+*/[Oo]bj/
+[Lls]og/
+[Ll]ogs/
+
+# NuGet Packages
+*.nupkg
+packages/
+
+# Rider / JetBrains IDE
+.idea/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
