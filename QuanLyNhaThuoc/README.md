@@ -56,36 +56,29 @@
 Ứng dụng được thiết kế theo hướng **Modularity & Clean Logic Pattern**, tách biệt rõ ràng giữa mô hình dữ liệu (Data Models), giao diện người dùng (UI Event Handlers), và bộ máy xử lý (In-Memory Processing Engine).
 
 ```mermaid
-graph TD
-    %% Styling
-    classDef ui fill:#0078D4,stroke:#004578,stroke-width:2px,color:#fff;
-    classDef logic fill:#239120,stroke:#107C41,stroke-width:2px,color:#fff;
-    classDef model fill:#512BD4,stroke:#3B1FA7,stroke-width:2px,color:#fff;
-    classDef validation fill:#D83B01,stroke:#A80000,stroke-width:2px,color:#fff;
-
+flowchart TD
     subgraph UI_Layer ["📱 Giao Diện Người Dùng (Presentation Layer)"]
-        F1["Form1 (WinForms View)"] :::ui
-        MB["MessageBox & Notification Dialogs"] :::ui
+        F1["Form1 (WinForms View)"]
+        MB["MessageBox & Notification Dialogs"]
     end
 
     subgraph Controller_Layer ["⚙️ Bộ Máy Xử Lý Trung Tâm (Core Engine)"]
-        POS["POS & Checkout Manager"] :::logic
-        CRM["Customer & Loyalty Manager"] :::logic
-        INV["Inventory Search Engine"] :::logic
+        POS["POS & Checkout Manager"]
+        CRM["Customer & Loyalty Manager"]
+        INV["Inventory Search Engine"]
     end
 
     subgraph Validation_Layer ["🛡️ Kiểm Soát Dữ Liệu (Validation Engine)"]
-        REG1["Phone Format Regex (^0\\d{9}$)"] :::validation
-        REG2["Name Standard Regex (^[\p{L}\s]+$)"] :::validation
+        REG1["Phone Format Regex Validator"]
+        REG2["Name Standard Regex Validator"]
     end
 
     subgraph Data_Layer ["💾 Mô Hình Dữ Liệu (Domain Models & State)"]
-        M1["Medicine (Name, Price)"] :::model
-        C1["Customer (Name, NumPhone, Point)"] :::model
-        ST["In-Memory State Manager (LINQ / List<T>)"] :::model
+        M1["Medicine (Name, Price)"]
+        C1["Customer (Name, NumPhone, Point)"]
+        ST["In-Memory State Manager (LINQ Engine)"]
     end
 
-    %% Flow connections
     F1 --> POS
     F1 --> CRM
     F1 --> INV
@@ -99,6 +92,16 @@ graph TD
     
     ST --> M1
     ST --> C1
+
+    classDef ui fill:#0078D4,stroke:#004578,stroke-width:2px,color:#fff;
+    classDef logic fill:#239120,stroke:#107C41,stroke-width:2px,color:#fff;
+    classDef model fill:#512BD4,stroke:#3B1FA7,stroke-width:2px,color:#fff;
+    classDef validation fill:#D83B01,stroke:#A80000,stroke-width:2px,color:#fff;
+
+    class F1,MB ui;
+    class POS,CRM,INV logic;
+    class REG1,REG2 validation;
+    class M1,C1,ST model;
 ```
 
 ---
