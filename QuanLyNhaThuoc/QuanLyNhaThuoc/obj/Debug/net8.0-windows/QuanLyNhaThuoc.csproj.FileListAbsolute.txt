@@ -1,0 +1,16 @@
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\bin\Debug\net8.0-windows\QuanLyNhaThuoc.exe
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\bin\Debug\net8.0-windows\QuanLyNhaThuoc.deps.json
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\bin\Debug\net8.0-windows\QuanLyNhaThuoc.runtimeconfig.json
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\bin\Debug\net8.0-windows\QuanLyNhaThuoc.dll
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\bin\Debug\net8.0-windows\QuanLyNhaThuoc.pdb
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\QuanLyNhaThuoc.Form1.resources
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\QuanLyNhaThuoc.csproj.GenerateResource.cache
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\QuanLyNhaThuoc.GeneratedMSBuildEditorConfig.editorconfig
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\QuanLyNhaThuoc.AssemblyInfoInputs.cache
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\QuanLyNhaThuoc.AssemblyInfo.cs
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\QuanLyNhaThuoc.csproj.CoreCompileInputs.cache
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\QuanLyNhaThuoc.dll
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\refint\QuanLyNhaThuoc.dll
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\QuanLyNhaThuoc.pdb
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\QuanLyNhaThuoc.genruntimeconfig.cache
+D:\LAB\PTUDD\QuanLyNhaThuoc\QuanLyNhaThuoc\obj\Debug\net8.0-windows\ref\QuanLyNhaThuoc.dll
