@@ -206,15 +206,6 @@ QuanLyNhaThuoc/
 - [ ] **Giai đoạn 3**: Tích hợp in hóa đơn nhiệt **POS Thermal Printer (80mm)** qua cổng USB/LAN.
 - [ ] **Giai đoạn 4**: Tích hợp cổng thanh toán mã **VietQR (Napas247)** tự động tạo mã QR chuyển khoản theo số tiền hóa đơn.
 - [ ] **Giai đoạn 5**: Quản lý hạn sử dụng (Expiry Date) & cảnh báo lô thuốc sắp hết hạn (FEFO/FIFO).
-
----
-
-## 📄 Giấy Phép & Đóng Góp (License & Contributing)
-
-Phần mềm được phát hành dưới giấy phép [MIT License](LICENSE). Mọi đóng góp từ cộng đồng (Pull Requests, Issue Reports, Feature Proposals) đều được hoan nghênh nhiệt liệt!
-
----
-
 <div align="center">
 
 ⭐ **If you find this project useful, please consider giving it a star!** ⭐
