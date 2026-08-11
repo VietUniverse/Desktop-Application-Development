@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🏨 GRAND HOTEL SUITE — HỆ THỐNG QUẢN LÝ KHÁCH SẠN & DỊCH VỤ DỰỠNG BỆNH/NGHỈ DƯỠNG
+# 🏨 GRAND HOTEL SUITE — HỆ THỐNG QUẢN LÝ KHÁCH SẠN
 
 [![.NET 8.0](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![C# 12](https://img.shields.io/badge/C%23-12.0-239120?style=for-the-badge&logo=c-sharp&logoColor=white)](https://docs.microsoft.com/en-us/dotnet/csharp/)
@@ -208,12 +208,6 @@ QuanLyKhachSan/
 - [ ] **Giai đoạn 2**: Tích hợp cơ sở dữ liệu **SQL Server** kết nối qua **Entity Framework Core 8**.
 - [ ] **Giai đoạn 3**: Xuất hóa đơn dịch vụ định dạng **PDF / Excel** và in hóa đơn thanh toán khi trả phòng.
 - [ ] **Giai đoạn 4**: Tích hợp mã **VietQR** thanh toán tự động theo tổng bill dịch vụ từng phòng.
-
----
-
-## 📄 Giấy Phép (License)
-
-Phần mềm được phát hành dưới giấy phép [MIT License](LICENSE).
 
 ---
 

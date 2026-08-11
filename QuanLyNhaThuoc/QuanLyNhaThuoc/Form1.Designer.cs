@@ -50,6 +50,7 @@
             calc = new Button();
             proBox = new ComboBox();
             addProduct = new Button();
+            label1 = new Label();
             ((System.ComponentModel.ISupportInitialize)leaderboard).BeginInit();
             ((System.ComponentModel.ISupportInitialize)customer).BeginInit();
             ((System.ComponentModel.ISupportInitialize)menuPro).BeginInit();
@@ -123,9 +124,9 @@
             // 
             leaderboard.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             leaderboard.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            leaderboard.Location = new Point(769, 8);
+            leaderboard.Location = new Point(769, 31);
             leaderboard.Name = "leaderboard";
-            leaderboard.Size = new Size(327, 558);
+            leaderboard.Size = new Size(327, 535);
             leaderboard.TabIndex = 5;
             // 
             // contextMenuStrip1
@@ -225,12 +226,23 @@
             addProduct.UseVisualStyleBackColor = true;
             addProduct.Click += addPro_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 12F);
+            label1.Location = new Point(878, 5);
+            label1.Name = "label1";
+            label1.Size = new Size(116, 21);
+            label1.TabIndex = 9;
+            label1.Text = "Bảng Xếp Hạng";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.LightGray;
             ClientSize = new Size(1121, 608);
+            Controls.Add(label1);
             Controls.Add(proBox);
             Controls.Add(menuPro);
             Controls.Add(customer);
@@ -279,5 +291,6 @@
         private Button calc;
         private ComboBox proBox;
         private Button addProduct;
+        private Label label1;
     }
 }
