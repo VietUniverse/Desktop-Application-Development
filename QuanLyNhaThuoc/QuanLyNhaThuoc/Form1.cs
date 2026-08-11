@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.Text.RegularExpressions;
 namespace QuanLyNhaThuoc
@@ -143,7 +143,7 @@ namespace QuanLyNhaThuoc
         {
             string name = proBox.Text.Trim();
 
-            Medicine medicine = medicines.FirstOrDefault(
+            Medicine? medicine = medicines.FirstOrDefault(
                 x => x.Name.Equals(
                     name,
                     StringComparison.OrdinalIgnoreCase)
@@ -233,7 +233,7 @@ namespace QuanLyNhaThuoc
             int newPoint = GetCurrentPoint();
 
             // Tìm khách hàng theo SĐT
-            Customer customerFound = customers.FirstOrDefault(
+            Customer? customerFound = customers.FirstOrDefault(
                 x => x.NumPhone == sdt
             );
 
