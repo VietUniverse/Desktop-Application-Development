@@ -3,15 +3,15 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 namespace QuanLyNhaThuoc
 {
-    public partial class Form1 : Form
+    public partial class FormMain : Form
     {
 
         List<Medicine> medicines = new List<Medicine>();
         List<Customer> customers = new List<Customer>();
-        List<Medicine> buyings = new List<Medicine>();
+        List<CartItem> buyings = new List<CartItem>();
 
 
-        public Form1()
+        public FormMain()
         {
             InitializeComponent();
 
@@ -29,6 +29,8 @@ namespace QuanLyNhaThuoc
 
             proBox.DropDownStyle = ComboBoxStyle.DropDown;
             proBox.AutoCompleteMode = AutoCompleteMode.None;
+
+            SetupContextMenu();
         }
 
         private void ShowAllCustomers()
@@ -78,10 +80,7 @@ namespace QuanLyNhaThuoc
         }
         private void CheckInput_Calc()
         {
-            calc.Enabled =
-                !string.IsNullOrWhiteSpace(sdtBox.Text) &&
-                !string.IsNullOrWhiteSpace(nameBox.Text) &&
-                buyings.Count > 0;
+            calc.Enabled = buyings.Count > 0;
         }
         private void proBox_TextChanged(object sender, EventArgs e)
         {
@@ -130,7 +129,7 @@ namespace QuanLyNhaThuoc
         }
         private void UpdateTotal()
         {
-            float totalMoney = buyings.Sum(x => x.Price);
+            float totalMoney = buyings.Sum(x => x.TotalPrice);
 
             money.Text = $"{totalMoney:N0}đ";
 
@@ -142,6 +141,7 @@ namespace QuanLyNhaThuoc
         private void addPro_Click(object sender, EventArgs e)
         {
             string name = proBox.Text.Trim();
+            int qty = (int)nudQuantity.Value;
 
             Medicine? medicine = medicines.FirstOrDefault(
                 x => x.Name.Equals(
@@ -155,7 +155,15 @@ namespace QuanLyNhaThuoc
                 return;
             }
 
-            buyings.Add(medicine);
+            CartItem? existingItem = buyings.FirstOrDefault(x => x.Name.Equals(medicine.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingItem != null)
+            {
+                existingItem.Quantity += qty;
+            }
+            else
+            {
+                buyings.Add(new CartItem(medicine.Name, medicine.Price, qty));
+            }
 
             menuPro.DataSource = null;
             menuPro.DataSource = buyings;
@@ -164,6 +172,7 @@ namespace QuanLyNhaThuoc
             CheckInput_Calc();
 
             proBox.Text = "";
+            nudQuantity.Value = 1;
         }
         private void find_Click(object sender, EventArgs e)
         {
@@ -191,7 +200,7 @@ namespace QuanLyNhaThuoc
 
         private int GetCurrentPoint()
         {
-            float totalMoney = buyings.Sum(x => x.Price);
+            float totalMoney = buyings.Sum(x => x.TotalPrice);
 
             return (int)(totalMoney / 1000);
         }
@@ -247,20 +256,20 @@ namespace QuanLyNhaThuoc
                 MessageBox.Show(
                     $"Khách hàng: {customerFound.Name}\n" +
                     $"SĐT: {customerFound.NumPhone}\n\n" +
-                    $"Điểm tích lũy thêm: {newPoint}\n" +
-                    $"Tổng điểm hiện tại: {customerFound.Point}",
+                    $"➕ Điểm tích lũy thêm: +{newPoint}\n" +
+                    $"🌟 Tổng điểm hiện tại: {customerFound.Point}",
                     "Thanh toán thành công",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
                 );
 
                 // Cập nhật bảng khách hàng
-                customer.DataSource = null;
-                customer.DataSource = customers;
+                ShowAllCustomers();
 
                 // Cập nhật bảng xếp hạng
                 LoadLeaderboard();
 
+                ClearBill();
                 return;
             }
 
@@ -291,8 +300,7 @@ namespace QuanLyNhaThuoc
                 customers.Add(newCustomer);
 
                 // Cập nhật bảng khách hàng
-                customer.DataSource = null;
-                customer.DataSource = customers;
+                ShowAllCustomers();
 
                 // Cập nhật bảng xếp hạng
                 LoadLeaderboard();
@@ -321,6 +329,10 @@ namespace QuanLyNhaThuoc
             points.Text = "0";
 
             proBox.Text = "";
+            sdtBox.Clear();
+            nameBox.Clear();
+            txtEditPoint.Clear();
+            CheckInput_Calc();
         }
 
         private void register_Click(object sender, EventArgs e)
@@ -398,6 +410,197 @@ namespace QuanLyNhaThuoc
             sdtBox.Clear();
             nameBox.Clear();
         }
+
+        private void customer_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.RowIndex >= customer.Rows.Count) return;
+
+            DataGridViewRow row = customer.Rows[e.RowIndex];
+            if (row.DataBoundItem is Customer cust)
+            {
+                nameBox.Text = cust.Name;
+                sdtBox.Text = cust.NumPhone;
+                txtEditPoint.Text = cust.Point.ToString();
+            }
+        }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            string sdt = sdtBox.Text.Trim();
+            string hoTen = nameBox.Text.Trim();
+            string strPoint = txtEditPoint.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(sdt) || string.IsNullOrWhiteSpace(hoTen))
+            {
+                MessageBox.Show("Vui lòng chọn hoặc nhập SĐT và Họ tên khách hàng cần cập nhật!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (!int.TryParse(strPoint, out int newPoint) || newPoint < 0)
+            {
+                MessageBox.Show("Số điểm tích lũy phải là số nguyên không âm!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEditPoint.Focus();
+                return;
+            }
+
+            // Kiểm tra định dạng số điện thoại
+            if (!Regex.IsMatch(sdt, @"^0\d{9}$"))
+            {
+                MessageBox.Show("Số điện thoại phải có đúng 10 chữ số!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                sdtBox.Focus();
+                return;
+            }
+
+            // Kiểm tra họ tên
+            if (!Regex.IsMatch(hoTen, @"^[\p{L}\s]+$"))
+            {
+                MessageBox.Show("Họ và tên chỉ được chứa chữ cái và khoảng trắng!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                nameBox.Focus();
+                return;
+            }
+
+            Customer? customerFound = customers.FirstOrDefault(x => x.NumPhone == sdt);
+            if (customerFound != null)
+            {
+                customerFound.Name = hoTen;
+                customerFound.Point = newPoint;
+
+                ShowAllCustomers();
+                LoadLeaderboard();
+
+                MessageBox.Show($"Cập nhật thông tin và điểm tích lũy thành công cho khách hàng: {hoTen}!\nSố điểm mới: {newPoint}", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Không tìm thấy khách hàng với SĐT này để cập nhật!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // =========================================================================
+        // 🖱️ THÀNH PHẦN MENU CHUỘT PHẢI (CONTEXT MENU STRIP) CHO DATAGRIDVIEW
+        // =========================================================================
+        private ContextMenuStrip cmsCustomer = new ContextMenuStrip();
+        private ContextMenuStrip cmsCart = new ContextMenuStrip();
+
+        private void SetupContextMenu()
+        {
+            // --- Context Menu cho Bảng Khách Hàng / Bảng Xếp Hạng ---
+            ToolStripMenuItem tsmiEdit = new ToolStripMenuItem("✏️ Sửa thông tin & Điểm tích lũy");
+            ToolStripMenuItem tsmiSelect = new ToolStripMenuItem("💳 Chọn khách hàng này để thanh toán");
+            ToolStripMenuItem tsmiDelete = new ToolStripMenuItem("🗑️ Xóa khách hàng này");
+
+            tsmiEdit.Click += (s, e) => txtEditPoint.Focus();
+            tsmiSelect.Click += (s, e) => CheckInput_Calc();
+            tsmiDelete.Click += TsmiDelete_Click;
+
+            cmsCustomer.Items.Add(tsmiEdit);
+            cmsCustomer.Items.Add(tsmiSelect);
+            cmsCustomer.Items.Add(new ToolStripSeparator());
+            cmsCustomer.Items.Add(tsmiDelete);
+
+            customer.ContextMenuStrip = cmsCustomer;
+            leaderboard.ContextMenuStrip = cmsCustomer;
+
+            customer.CellMouseDown += Customer_CellMouseDown;
+            leaderboard.CellMouseDown += Leaderboard_CellMouseDown;
+
+            // --- Context Menu cho Bảng Giỏ Hàng Thuốc ---
+            ToolStripMenuItem tsmiRemoveItem = new ToolStripMenuItem("🗑️ Xóa thuốc này khỏi giỏ hàng");
+            ToolStripMenuItem tsmiClearAll = new ToolStripMenuItem("🧹 Xóa toàn bộ giỏ hàng");
+
+            tsmiRemoveItem.Click += TsmiRemoveItem_Click;
+            tsmiClearAll.Click += (s, e) => ClearBill();
+
+            cmsCart.Items.Add(tsmiRemoveItem);
+            cmsCart.Items.Add(tsmiClearAll);
+
+            menuPro.ContextMenuStrip = cmsCart;
+            menuPro.CellMouseDown += MenuPro_CellMouseDown;
+        }
+
+        private void Customer_CellMouseDown(object? sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.RowIndex < customer.Rows.Count)
+            {
+                customer.ClearSelection();
+                customer.Rows[e.RowIndex].Selected = true;
+
+                if (customer.Rows[e.RowIndex].DataBoundItem is Customer cust)
+                {
+                    nameBox.Text = cust.Name;
+                    sdtBox.Text = cust.NumPhone;
+                    txtEditPoint.Text = cust.Point.ToString();
+                }
+            }
+        }
+
+        private void Leaderboard_CellMouseDown(object? sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.RowIndex < leaderboard.Rows.Count)
+            {
+                leaderboard.ClearSelection();
+                leaderboard.Rows[e.RowIndex].Selected = true;
+
+                if (leaderboard.Rows[e.RowIndex].DataBoundItem is Customer cust)
+                {
+                    nameBox.Text = cust.Name;
+                    sdtBox.Text = cust.NumPhone;
+                    txtEditPoint.Text = cust.Point.ToString();
+                }
+            }
+        }
+
+        private void MenuPro_CellMouseDown(object? sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.RowIndex < menuPro.Rows.Count)
+            {
+                menuPro.ClearSelection();
+                menuPro.Rows[e.RowIndex].Selected = true;
+            }
+        }
+
+        private void TsmiDelete_Click(object? sender, EventArgs e)
+        {
+            string sdt = sdtBox.Text.Trim();
+            string name = nameBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(sdt))
+            {
+                MessageBox.Show("Vui lòng chọn khách hàng muốn xóa!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var dialog = MessageBox.Show($"Bạn có chắc chắn muốn xóa khách hàng {name} (SĐT: {sdt}) khỏi hệ thống?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dialog == DialogResult.Yes)
+            {
+                customers.RemoveAll(x => x.NumPhone == sdt);
+                ShowAllCustomers();
+                LoadLeaderboard();
+
+                sdtBox.Clear();
+                nameBox.Clear();
+                txtEditPoint.Clear();
+
+                MessageBox.Show($"Đã xóa thành công khách hàng {name}!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void TsmiRemoveItem_Click(object? sender, EventArgs e)
+        {
+            if (menuPro.SelectedRows.Count > 0)
+            {
+                int index = menuPro.SelectedRows[0].Index;
+                if (index >= 0 && index < buyings.Count)
+                {
+                    buyings.RemoveAt(index);
+                    menuPro.DataSource = null;
+                    menuPro.DataSource = buyings;
+                    UpdateTotal();
+                    CheckInput_Calc();
+                }
+            }
+        }
+
         private void label3_Click(object sender, EventArgs e)
         {
 

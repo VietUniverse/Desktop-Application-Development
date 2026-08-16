@@ -28,7 +28,6 @@ namespace Btap_ThietKeForm
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.họVàTênSinhViênToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bài1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,7 +60,6 @@ namespace Btap_ThietKeForm
             // 
             // bài1ToolStripMenuItem
             // 
-            this.bài1ToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("bài1ToolStripMenuItem.Image")));
             this.bài1ToolStripMenuItem.Name = "bài1ToolStripMenuItem";
             this.bài1ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.bài1ToolStripMenuItem.Text = "Bài 1";
@@ -69,7 +67,6 @@ namespace Btap_ThietKeForm
             // 
             // bàiToolStripMenuItem
             // 
-            this.bàiToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("bàiToolStripMenuItem.Image")));
             this.bàiToolStripMenuItem.Name = "bàiToolStripMenuItem";
             this.bàiToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.bàiToolStripMenuItem.Text = "Bài 2";
@@ -77,7 +74,6 @@ namespace Btap_ThietKeForm
             // 
             // bài3ToolStripMenuItem
             // 
-            this.bài3ToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("bài3ToolStripMenuItem.Image")));
             this.bài3ToolStripMenuItem.Name = "bài3ToolStripMenuItem";
             this.bài3ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.bài3ToolStripMenuItem.Text = "Bài 3";
@@ -85,7 +81,6 @@ namespace Btap_ThietKeForm
             // 
             // bài4ToolStripMenuItem
             // 
-            this.bài4ToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("bài3ToolStripMenuItem.Image")));
             this.bài4ToolStripMenuItem.Name = "bài4ToolStripMenuItem";
             this.bài4ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.bài4ToolStripMenuItem.Text = "Bài 4";
@@ -99,6 +94,7 @@ namespace Btap_ThietKeForm
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "frmMain";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Chương trình chính";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -117,4 +113,3 @@ namespace Btap_ThietKeForm
         private System.Windows.Forms.ToolStripMenuItem bài4ToolStripMenuItem;
     }
 }
-

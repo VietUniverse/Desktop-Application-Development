@@ -1,6 +1,6 @@
-﻿namespace QuanLyNhaThuoc
+namespace QuanLyNhaThuoc
 {
-    partial class Form1
+    partial class FormMain
     {
         /// <summary>
         ///  Required designer variable.
@@ -49,11 +49,16 @@
             points = new Label();
             calc = new Button();
             proBox = new ComboBox();
+            nudQuantity = new NumericUpDown();
             addProduct = new Button();
             label1 = new Label();
+            btnUpdate = new Button();
+            txtEditPoint = new TextBox();
+            lblEditPoint = new Label();
             ((System.ComponentModel.ISupportInitialize)leaderboard).BeginInit();
             ((System.ComponentModel.ISupportInitialize)customer).BeginInit();
             ((System.ComponentModel.ISupportInitialize)menuPro).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudQuantity).BeginInit();
             SuspendLayout();
             // 
             // sdtBox
@@ -173,6 +178,7 @@
             customer.Name = "customer";
             customer.Size = new Size(327, 475);
             customer.TabIndex = 8;
+            customer.CellClick += customer_CellClick;
             // 
             // menuPro
             // 
@@ -203,18 +209,28 @@
             calc.TabIndex = 4;
             calc.Text = "Tính Tiền";
             calc.UseVisualStyleBackColor = true;
-            calc.Click += button1_Click_1;
+            calc.Click += calc_Click;
             // 
             // proBox
             // 
             proBox.FormattingEnabled = true;
             proBox.Location = new Point(94, 86);
             proBox.Name = "proBox";
-            proBox.Size = new Size(267, 23);
+            proBox.Size = new Size(185, 23);
             proBox.TabIndex = 2;
             proBox.DropDown += proBox_DropDown;
             proBox.TextUpdate += proBox_TextUpdate;
             proBox.TextChanged += proBox_TextChanged;
+            // 
+            // nudQuantity
+            // 
+            nudQuantity.Location = new Point(284, 86);
+            nudQuantity.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            nudQuantity.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudQuantity.Name = "nudQuantity";
+            nudQuantity.Size = new Size(77, 23);
+            nudQuantity.TabIndex = 20;
+            nudQuantity.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // addProduct
             // 
@@ -236,12 +252,43 @@
             label1.TabIndex = 9;
             label1.Text = "Bảng Xếp Hạng";
             // 
-            // Form1
+            // btnUpdate
+            // 
+            btnUpdate.AutoSize = true;
+            btnUpdate.Location = new Point(615, 57);
+            btnUpdate.Name = "btnUpdate";
+            btnUpdate.Size = new Size(117, 25);
+            btnUpdate.TabIndex = 12;
+            btnUpdate.Text = "Cập Nhật Điểm";
+            btnUpdate.UseVisualStyleBackColor = true;
+            btnUpdate.Click += btnUpdate_Click;
+            // 
+            // txtEditPoint
+            // 
+            txtEditPoint.Location = new Point(490, 57);
+            txtEditPoint.Name = "txtEditPoint";
+            txtEditPoint.Size = new Size(119, 23);
+            txtEditPoint.TabIndex = 11;
+            // 
+            // lblEditPoint
+            // 
+            lblEditPoint.AutoSize = true;
+            lblEditPoint.Location = new Point(405, 60);
+            lblEditPoint.Name = "lblEditPoint";
+            lblEditPoint.Size = new Size(83, 15);
+            lblEditPoint.TabIndex = 10;
+            lblEditPoint.Text = "Điểm Tích Lũy";
+            // 
+            // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.LightGray;
             ClientSize = new Size(1121, 608);
+            Controls.Add(nudQuantity);
+            Controls.Add(btnUpdate);
+            Controls.Add(txtEditPoint);
+            Controls.Add(lblEditPoint);
             Controls.Add(label1);
             Controls.Add(proBox);
             Controls.Add(menuPro);
@@ -258,11 +305,12 @@
             Controls.Add(sdt);
             Controls.Add(nameBox);
             Controls.Add(sdtBox);
-            Name = "Form1";
+            Name = "FormMain";
             Text = "QuanLyNhaThuoc";
             ((System.ComponentModel.ISupportInitialize)leaderboard).EndInit();
             ((System.ComponentModel.ISupportInitialize)customer).EndInit();
             ((System.ComponentModel.ISupportInitialize)menuPro).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudQuantity).EndInit();
             ResumeLayout(false);
             PerformLayout();
 
@@ -277,6 +325,9 @@
         private Label products;
         private Button register;
         private Button find;
+        private Button btnUpdate;
+        private TextBox txtEditPoint;
+        private Label lblEditPoint;
         private DataGridView leaderboard;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private ContextMenuStrip contextMenuStrip1;
@@ -290,6 +341,7 @@
         private Label points;
         private Button calc;
         private ComboBox proBox;
+        private NumericUpDown nudQuantity;
         private Button addProduct;
         private Label label1;
     }
