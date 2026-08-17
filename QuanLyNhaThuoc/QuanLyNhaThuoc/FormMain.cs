@@ -9,6 +9,8 @@ namespace QuanLyNhaThuoc
         List<Medicine> medicines = new List<Medicine>();
         List<Customer> customers = new List<Customer>();
         List<CartItem> buyings = new List<CartItem>();
+        List<RewardItem> rewards = new List<RewardItem>();
+        List<Invoice> invoices = new List<Invoice>();
 
 
         public FormMain()
@@ -20,15 +22,21 @@ namespace QuanLyNhaThuoc
             addProduct.Enabled = false;
             calc.Enabled = false;
 
+            invoices = DataManager.LoadInvoices();
             LoadCustomers();
             LoadLeaderboard();
             LoadMedicines();
+            LoadRewards();
 
             menuPro.DataSource = buyings;
             customer.DataSource = customers;
 
             proBox.DropDownStyle = ComboBoxStyle.DropDown;
-            proBox.AutoCompleteMode = AutoCompleteMode.None;
+            proBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            proBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+            proBox.KeyDown += proBox_KeyDown;
+            nudQuantity.KeyDown += nudQuantity_KeyDown;
 
             SetupContextMenu();
         }
@@ -71,62 +79,66 @@ namespace QuanLyNhaThuoc
 
         private void CheckInput_Product()
         {
-            addProduct.Enabled =
-                !string.IsNullOrWhiteSpace(proBox.Text) &&
-                medicines.Any(x =>
-                    x.Name.Equals(
-                        proBox.Text.Trim(),
-                        StringComparison.OrdinalIgnoreCase));
+            try
+            {
+                string text = (proBox.Text ?? string.Empty).Trim();
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    addProduct.Enabled = false;
+                    return;
+                }
+
+                addProduct.Enabled = medicines.Any(x => x.Name.Equals(text, StringComparison.OrdinalIgnoreCase));
+            }
+            catch
+            {
+                addProduct.Enabled = false;
+            }
         }
+
         private void CheckInput_Calc()
         {
             calc.Enabled = buyings.Count > 0;
         }
+
         private void proBox_TextChanged(object sender, EventArgs e)
         {
             CheckInput_Product();
-            
         }
+
         private void proBox_TextUpdate(object sender, EventArgs e)
         {
-            string text = proBox.Text;
-
-            var result = medicines
-                .Where(x => x.Name.Contains(
-                    text,
-                    StringComparison.OrdinalIgnoreCase))
-                .Take(10)
-                .ToList();
-
-            proBox.Items.Clear();
-
-            foreach (Medicine medicine in result)
-            {
-                proBox.Items.Add(medicine.Name);
-            }
-
-            proBox.Text = text;
-            proBox.SelectionStart = text.Length;
-
-            if (result.Count > 0 && !string.IsNullOrWhiteSpace(text))
-            {
-                proBox.DroppedDown = true;
-            }
-
             CheckInput_Product();
         }
-        private void proBox_DropDown(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(proBox.Text))
-            {
-                proBox.Items.Clear();
 
-                foreach (Medicine medicine in medicines.Take(10))
+        private void proBox_KeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true; // Chặn tiếng kêu bíp hệ thống WinForms
+                if (addProduct.Enabled)
                 {
-                    proBox.Items.Add(medicine.Name);
+                    addPro_Click(sender, e);
+                }
+                else
+                {
+                    nudQuantity.Focus();
                 }
             }
         }
+
+        private void nudQuantity_KeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true; // Chặn tiếng kêu bíp hệ thống WinForms
+                if (addProduct.Enabled)
+                {
+                    addPro_Click(sender, e);
+                }
+            }
+        }
+
         private void UpdateTotal()
         {
             float totalMoney = buyings.Sum(x => x.TotalPrice);
@@ -138,7 +150,7 @@ namespace QuanLyNhaThuoc
             points.Text = totalPoint.ToString();
         }
 
-        private void addPro_Click(object sender, EventArgs e)
+        private void addPro_Click(object? sender, EventArgs e)
         {
             string name = proBox.Text.Trim();
             int qty = (int)nudQuantity.Value;
@@ -173,6 +185,7 @@ namespace QuanLyNhaThuoc
 
             proBox.Text = "";
             nudQuantity.Value = 1;
+            proBox.Focus();
         }
         private void find_Click(object sender, EventArgs e)
         {
@@ -253,22 +266,27 @@ namespace QuanLyNhaThuoc
             {
                 customerFound.Point += newPoint;
 
+                float totalMoney = buyings.Sum(x => x.TotalPrice);
+                string invId = "HD" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                Invoice inv = new Invoice(invId, customerFound.NumPhone, customerFound.Name, DateTime.Now, new List<CartItem>(buyings), totalMoney, newPoint);
+                invoices.Add(inv);
+
+                DataManager.SaveInvoices(invoices);
+                DataManager.SaveCustomers(customers);
+
                 MessageBox.Show(
                     $"Khách hàng: {customerFound.Name}\n" +
                     $"SĐT: {customerFound.NumPhone}\n\n" +
                     $"➕ Điểm tích lũy thêm: +{newPoint}\n" +
-                    $"🌟 Tổng điểm hiện tại: {customerFound.Point}",
+                    $"🌟 Tổng điểm hiện tại: {customerFound.Point}\n\n" +
+                    $"📜 Đã lưu hóa đơn {invId} vào Lịch sử mua hàng!",
                     "Thanh toán thành công",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
                 );
 
-                // Cập nhật bảng khách hàng
                 ShowAllCustomers();
-
-                // Cập nhật bảng xếp hạng
                 LoadLeaderboard();
-
                 ClearBill();
                 return;
             }
@@ -276,7 +294,6 @@ namespace QuanLyNhaThuoc
             // =========================
             // KHÁCH CHƯA CÓ
             // =========================
-
             DialogResult result = MessageBox.Show(
                 $"Không tìm thấy khách hàng trong hệ thống.\n\n" +
                 $"SĐT: {sdt}\n" +
@@ -289,27 +306,31 @@ namespace QuanLyNhaThuoc
 
             if (result == DialogResult.Yes)
             {
-                // Tạo khách hàng mới
                 Customer newCustomer = new Customer(
                     name,
                     sdt,
                     newPoint
                 );
 
-                // Thêm vào danh sách
                 customers.Add(newCustomer);
 
-                // Cập nhật bảng khách hàng
-                ShowAllCustomers();
+                float totalMoney = buyings.Sum(x => x.TotalPrice);
+                string invId = "HD" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                Invoice inv = new Invoice(invId, newCustomer.NumPhone, newCustomer.Name, DateTime.Now, new List<CartItem>(buyings), totalMoney, newPoint);
+                invoices.Add(inv);
 
-                // Cập nhật bảng xếp hạng
+                DataManager.SaveInvoices(invoices);
+                DataManager.SaveCustomers(customers);
+
+                ShowAllCustomers();
                 LoadLeaderboard();
 
                 MessageBox.Show(
                     $"Đã đăng ký khách hàng mới!\n\n" +
                     $"Họ tên: {name}\n" +
                     $"SĐT: {sdt}\n" +
-                    $"Điểm tích lũy: {newPoint}",
+                    $"Điểm tích lũy: {newPoint}\n\n" +
+                    $"📜 Đã lưu hóa đơn {invId} vào Lịch sử mua hàng!",
                     "Đăng ký thành công",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
@@ -391,6 +412,7 @@ namespace QuanLyNhaThuoc
             };
 
             customers.Add(customerNew);
+            DataManager.SaveCustomers(customers);
 
             // Cập nhật DataGridView khách hàng
             customer.DataSource = null;
@@ -424,56 +446,70 @@ namespace QuanLyNhaThuoc
             }
         }
 
-        private void btnUpdate_Click(object sender, EventArgs e)
+        private void OpenEditCustomerDialog()
         {
             string sdt = sdtBox.Text.Trim();
-            string hoTen = nameBox.Text.Trim();
-            string strPoint = txtEditPoint.Text.Trim();
+            Customer? targetCust = customers.FirstOrDefault(x => x.NumPhone == sdt);
 
-            if (string.IsNullOrWhiteSpace(sdt) || string.IsNullOrWhiteSpace(hoTen))
+            if (targetCust == null && customer.SelectedRows.Count > 0)
             {
-                MessageBox.Show("Vui lòng chọn hoặc nhập SĐT và Họ tên khách hàng cần cập nhật!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                targetCust = customer.SelectedRows[0].DataBoundItem as Customer;
+            }
+
+            if (targetCust == null && leaderboard.SelectedRows.Count > 0)
+            {
+                targetCust = leaderboard.SelectedRows[0].DataBoundItem as Customer;
+            }
+
+            if (targetCust == null)
+            {
+                MessageBox.Show("Vui lòng chọn một khách hàng trong danh sách hoặc nhập SĐT để chỉnh sửa thông tin!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (!int.TryParse(strPoint, out int newPoint) || newPoint < 0)
+            FormEditCustomer editForm = new FormEditCustomer(targetCust, customers);
+            if (editForm.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show("Số điểm tích lũy phải là số nguyên không âm!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtEditPoint.Focus();
-                return;
-            }
+                sdtBox.Text = targetCust.NumPhone;
+                nameBox.Text = targetCust.Name;
+                txtEditPoint.Text = targetCust.Point.ToString();
 
-            // Kiểm tra định dạng số điện thoại
-            if (!Regex.IsMatch(sdt, @"^0\d{9}$"))
-            {
-                MessageBox.Show("Số điện thoại phải có đúng 10 chữ số!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                sdtBox.Focus();
-                return;
-            }
-
-            // Kiểm tra họ tên
-            if (!Regex.IsMatch(hoTen, @"^[\p{L}\s]+$"))
-            {
-                MessageBox.Show("Họ và tên chỉ được chứa chữ cái và khoảng trắng!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                nameBox.Focus();
-                return;
-            }
-
-            Customer? customerFound = customers.FirstOrDefault(x => x.NumPhone == sdt);
-            if (customerFound != null)
-            {
-                customerFound.Name = hoTen;
-                customerFound.Point = newPoint;
-
+                DataManager.SaveCustomers(customers);
                 ShowAllCustomers();
                 LoadLeaderboard();
 
-                MessageBox.Show($"Cập nhật thông tin và điểm tích lũy thành công cho khách hàng: {hoTen}!\nSố điểm mới: {newPoint}", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Cập nhật toàn bộ thông tin thành công cho khách hàng: {targetCust.Name}!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            else
+        }
+
+        private void OpenCustomerHistory()
+        {
+            string sdt = sdtBox.Text.Trim();
+            Customer? targetCust = customers.FirstOrDefault(x => x.NumPhone == sdt);
+
+            if (targetCust == null && customer.SelectedRows.Count > 0)
             {
-                MessageBox.Show("Không tìm thấy khách hàng với SĐT này để cập nhật!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                targetCust = customer.SelectedRows[0].DataBoundItem as Customer;
             }
+
+            if (targetCust == null && leaderboard.SelectedRows.Count > 0)
+            {
+                targetCust = leaderboard.SelectedRows[0].DataBoundItem as Customer;
+            }
+
+            if (targetCust == null)
+            {
+                MessageBox.Show("Vui lòng chọn một khách hàng trong danh sách hoặc nhập SĐT để xem lịch sử mua hàng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            FormHistory historyForm = new FormHistory(targetCust, invoices);
+            historyForm.ShowDialog();
+        }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            OpenEditCustomerDialog();
         }
 
         // =========================================================================
@@ -485,14 +521,17 @@ namespace QuanLyNhaThuoc
         private void SetupContextMenu()
         {
             // --- Context Menu cho Bảng Khách Hàng / Bảng Xếp Hạng ---
-            ToolStripMenuItem tsmiEdit = new ToolStripMenuItem("✏️ Sửa thông tin & Điểm tích lũy");
+            ToolStripMenuItem tsmiHistory = new ToolStripMenuItem("📜 Xem lịch sử mua hàng của khách hàng này");
+            ToolStripMenuItem tsmiEdit = new ToolStripMenuItem("✏️ Sửa toàn bộ thông tin khách hàng (Tên, SĐT, Điểm)");
             ToolStripMenuItem tsmiSelect = new ToolStripMenuItem("💳 Chọn khách hàng này để thanh toán");
             ToolStripMenuItem tsmiDelete = new ToolStripMenuItem("🗑️ Xóa khách hàng này");
 
-            tsmiEdit.Click += (s, e) => txtEditPoint.Focus();
+            tsmiHistory.Click += (s, e) => OpenCustomerHistory();
+            tsmiEdit.Click += (s, e) => OpenEditCustomerDialog();
             tsmiSelect.Click += (s, e) => CheckInput_Calc();
             tsmiDelete.Click += TsmiDelete_Click;
 
+            cmsCustomer.Items.Add(tsmiHistory);
             cmsCustomer.Items.Add(tsmiEdit);
             cmsCustomer.Items.Add(tsmiSelect);
             cmsCustomer.Items.Add(new ToolStripSeparator());
@@ -700,6 +739,17 @@ namespace QuanLyNhaThuoc
                     medicines.Add(new Medicine(parts[0], price));
                 }
             }
+
+            proBox.Items.Clear();
+            AutoCompleteStringCollection autoSource = new AutoCompleteStringCollection();
+            foreach (var m in medicines)
+            {
+                proBox.Items.Add(m.Name);
+                autoSource.Add(m.Name);
+            }
+            proBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            proBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            proBox.AutoCompleteCustomSource = autoSource;
         }
         private void LoadCustomers()
         {
@@ -713,6 +763,110 @@ namespace QuanLyNhaThuoc
             customers.Add(new Customer("Bùi Thị Lan", "0978901234", 156));
             customers.Add(new Customer("Ngô Văn Minh", "0989012345", 93));
             customers.Add(new Customer("Đỗ Thị Ngọc", "0990123456", 267));
+        }
+
+        private void LoadRewards()
+        {
+            rewards.Clear();
+            rewards.Add(new RewardItem("Khẩu trang y tế 4 lớp (50 cái)", 50));
+            rewards.Add(new RewardItem("Chai Xịt khuẩn Hand Sanitizer 100ml", 80));
+            rewards.Add(new RewardItem("Hộp Băng cá nhân Urgo (100 miếng)", 100));
+            rewards.Add(new RewardItem("Voucher Giảm 50.000đ Tiền Thuốc", 150));
+            rewards.Add(new RewardItem("Máy Đo Huyết Áp Điện Tử Omron", 500));
+            rewards.Add(new RewardItem("Bộ Thể Thao / Áo Phông VIP", 1000));
+
+            cboRewards.DataSource = null;
+            cboRewards.DataSource = rewards;
+        }
+
+        private void btnRedeemReward_Click(object sender, EventArgs e)
+        {
+            string sdt = sdtBox.Text.Trim();
+            string name = nameBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(sdt))
+            {
+                MessageBox.Show("Vui lòng chọn hoặc nhập SĐT khách hàng muốn đổi quà!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                sdtBox.Focus();
+                return;
+            }
+
+            Customer? cust = customers.FirstOrDefault(x => x.NumPhone == sdt);
+            if (cust == null)
+            {
+                MessageBox.Show("Không tìm thấy khách hàng trong hệ thống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (cboRewards.SelectedItem is RewardItem selectedReward)
+            {
+                if (cust.Point >= selectedReward.PointsRequired)
+                {
+                    cust.Point -= selectedReward.PointsRequired;
+                    txtEditPoint.Text = cust.Point.ToString();
+
+                    DataManager.SaveCustomers(customers);
+                    ShowAllCustomers();
+                    LoadLeaderboard();
+
+                    MessageBox.Show(
+                        $"🎁 ĐỔI QUÀ THÀNH CÔNG!\n\n" +
+                        $"Khách hàng: {cust.Name} (SĐT: {cust.NumPhone})\n" +
+                        $"Phần quà nhận: {selectedReward.Name}\n" +
+                        $"Trừ điểm tích lũy: -{selectedReward.PointsRequired} điểm\n" +
+                        $"🌟 Số điểm còn lại: {cust.Point} điểm",
+                        "Đổi Quà Thành Công",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+                }
+                else
+                {
+                    int missingPoints = selectedReward.PointsRequired - cust.Point;
+                    MessageBox.Show(
+                        $"Khách hàng {cust.Name} không đủ điểm để đổi quà này!\n\n" +
+                        $"• Điểm hiện tại: {cust.Point} điểm\n" +
+                        $"• Yêu cầu: {selectedReward.PointsRequired} điểm\n" +
+                        $"• Còn thiếu: {missingPoints} điểm",
+                        "Không Đủ Điểm",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+                }
+            }
+        }
+
+        private void btnResetNewYear_Click(object sender, EventArgs e)
+        {
+            var confirm = MessageBox.Show(
+                "🎆 XÁC NHẬN RESET ĐIỂM NĂM MỚI\n\n" +
+                "Bạn có chắc chắn muốn RESET TOÀN BỘ ĐIỂM TÍCH LŨY của TẤT CẢ KHÁCH HÀNG về 0 để bắt đầu Niên Độ Năm Mới không?\n\n" +
+                "⚠️ Thao tác này sẽ đặt điểm của tất cả khách hàng về 0!",
+                "Xác Nhận Reset Năm Mới",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (confirm == DialogResult.Yes)
+            {
+                foreach (var c in customers)
+                {
+                    c.Point = 0;
+                }
+
+                txtEditPoint.Clear();
+                DataManager.SaveCustomers(customers);
+                ShowAllCustomers();
+                LoadLeaderboard();
+
+                MessageBox.Show(
+                    "🎆 RESET ĐIỂM NĂM MỚI THÀNH CÔNG!\n\n" +
+                    "Toàn bộ điểm tích lũy của tất cả khách hàng đã được đặt về 0 để bắt đầu niên độ năm mới.",
+                    "Thông Báo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+            }
         }
     }
 }

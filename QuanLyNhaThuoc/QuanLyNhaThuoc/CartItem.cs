@@ -2,7 +2,7 @@ using System;
 
 namespace QuanLyNhaThuoc
 {
-    internal class CartItem
+    public class CartItem
     {
         public string Name { get; set; } = string.Empty;
         public float Price { get; set; }
@@ -17,5 +17,22 @@ namespace QuanLyNhaThuoc
         }
 
         public CartItem() { }
+    }
+
+    public class RewardItem
+    {
+        public string Name { get; set; } = string.Empty;
+        public int PointsRequired { get; set; }
+
+        public RewardItem(string name, int pointsRequired)
+        {
+            Name = name;
+            PointsRequired = pointsRequired;
+        }
+
+        public override string ToString()
+        {
+            return $"{Name} - {PointsRequired} điểm";
+        }
     }
 }

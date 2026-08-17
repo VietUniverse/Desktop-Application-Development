@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuanLyNhaThuoc
 {
-    internal class Customer
+    public class Customer
     {
         public string Name { get; set; } = string.Empty;
         public string NumPhone { get; set; } = string.Empty;

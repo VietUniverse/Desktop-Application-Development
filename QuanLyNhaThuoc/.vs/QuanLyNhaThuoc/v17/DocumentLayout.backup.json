@@ -3,16 +3,20 @@
   "WorkspaceRootPath": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|d:\\lab\\ptudd\\quanlynhathuoc\\quanlynhathuoc\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|solutionrelative:quanlynhathuoc\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|d:\\lab\\ptudd\\quanlynhathuoc\\quanlynhathuoc\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\quanlynhathuoc\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|solutionrelative:quanlynhathuoc\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
       "AbsoluteMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|d:\\lab\\ptudd\\quanlynhathuoc\\quanlynhathuoc\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|solutionrelative:quanlynhathuoc\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|d:\\lab\\ptudd\\quanlynhathuoc\\quanlynhathuoc\\formeditcustomer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|solutionrelative:quanlynhathuoc\\formeditcustomer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|d:\\lab\\ptudd\\quanlynhathuoc\\quanlynhathuoc\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|solutionrelative:quanlynhathuoc\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|d:\\lab\\ptudd\\quanlynhathuoc\\quanlynhathuoc\\medicine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -26,36 +30,49 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
+              "Title": "FormEditCustomer.cs",
+              "DocumentMoniker": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormEditCustomer.cs",
+              "RelativeDocumentMoniker": "QuanLyNhaThuoc\\FormEditCustomer.cs",
+              "ToolTip": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormEditCustomer.cs",
+              "RelativeToolTip": "QuanLyNhaThuoc\\FormEditCustomer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwA8AAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-17T01:54:17.7Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "FormMain.cs [Design]",
               "DocumentMoniker": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs",
               "RelativeDocumentMoniker": "QuanLyNhaThuoc\\FormMain.cs",
-              "ToolTip": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs [Design]",
-              "RelativeToolTip": "QuanLyNhaThuoc\\FormMain.cs [Design]",
+              "ToolTip": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs [Design]*",
+              "RelativeToolTip": "QuanLyNhaThuoc\\FormMain.cs [Design]*",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-16T23:04:48.052Z",
               "EditorCaption": " [Design]"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "FormMain.cs",
               "DocumentMoniker": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs",
               "RelativeDocumentMoniker": "QuanLyNhaThuoc\\FormMain.cs",
-              "ToolTip": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs",
-              "RelativeToolTip": "QuanLyNhaThuoc\\FormMain.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ToolTip": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs*",
+              "RelativeToolTip": "QuanLyNhaThuoc\\FormMain.cs*",
+              "ViewState": "AgIAAKsAAAAAAAAAAAAUwF4AAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-16T23:04:45.092Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "Customer.cs",
               "DocumentMoniker": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\Customer.cs",
               "RelativeDocumentMoniker": "QuanLyNhaThuoc\\Customer.cs",
@@ -68,15 +85,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Medicine.cs",
               "DocumentMoniker": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\Medicine.cs",
               "RelativeDocumentMoniker": "QuanLyNhaThuoc\\Medicine.cs",
               "ToolTip": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\Medicine.cs",
               "RelativeToolTip": "QuanLyNhaThuoc\\Medicine.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAaAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-10T14:15:58.991Z"
+              "WhenOpened": "2026-08-10T14:15:58.991Z",
+              "EditorCaption": ""
             }
           ]
         }

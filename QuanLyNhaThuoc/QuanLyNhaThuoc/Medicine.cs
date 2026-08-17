@@ -2,7 +2,7 @@ using System;
 
 namespace QuanLyNhaThuoc
 {
-    internal class Medicine
+    public class Medicine
     {
         public string Name { get; set; } = string.Empty;
         public float Price { get; set; }
