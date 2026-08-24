@@ -3,7 +3,7 @@
   "WorkspaceRootPath": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\quanlynhathuoc\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|d:\\lab\\ptudd\\quanlynhathuoc\\quanlynhathuoc\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{44AF1DFA-79E0-455B-B348-8EBFDF33E53E}|QuanLyNhaThuoc\\QuanLyNhaThuoc.csproj|solutionrelative:quanlynhathuoc\\formmain.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
@@ -42,8 +42,7 @@
               "RelativeToolTip": "QuanLyNhaThuoc\\FormEditCustomer.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwA8AAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-17T01:54:17.7Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-17T01:54:17.7Z"
             },
             {
               "$type": "Document",
@@ -51,8 +50,8 @@
               "Title": "FormMain.cs [Design]",
               "DocumentMoniker": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs",
               "RelativeDocumentMoniker": "QuanLyNhaThuoc\\FormMain.cs",
-              "ToolTip": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs [Design]*",
-              "RelativeToolTip": "QuanLyNhaThuoc\\FormMain.cs [Design]*",
+              "ToolTip": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs [Design]",
+              "RelativeToolTip": "QuanLyNhaThuoc\\FormMain.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-16T23:04:48.052Z",
               "EditorCaption": " [Design]"
@@ -63,12 +62,11 @@
               "Title": "FormMain.cs",
               "DocumentMoniker": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs",
               "RelativeDocumentMoniker": "QuanLyNhaThuoc\\FormMain.cs",
-              "ToolTip": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs*",
-              "RelativeToolTip": "QuanLyNhaThuoc\\FormMain.cs*",
+              "ToolTip": "D:\\LAB\\PTUDD\\QuanLyNhaThuoc\\QuanLyNhaThuoc\\FormMain.cs",
+              "RelativeToolTip": "QuanLyNhaThuoc\\FormMain.cs",
               "ViewState": "AgIAAKsAAAAAAAAAAAAUwF4AAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-16T23:04:45.092Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-16T23:04:45.092Z"
             },
             {
               "$type": "Document",
@@ -80,8 +78,7 @@
               "RelativeToolTip": "QuanLyNhaThuoc\\Customer.cs",
               "ViewState": "AgIAAAQAAAAAAAAAAAAuwAwAAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-10T14:16:16.696Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-10T14:16:16.696Z"
             },
             {
               "$type": "Document",
@@ -93,8 +90,7 @@
               "RelativeToolTip": "QuanLyNhaThuoc\\Medicine.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-10T14:15:58.991Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-10T14:15:58.991Z"
             }
           ]
         }

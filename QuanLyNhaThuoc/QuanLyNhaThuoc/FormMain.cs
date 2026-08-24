@@ -1,35 +1,52 @@
-using System.ComponentModel;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+
 namespace QuanLyNhaThuoc
 {
-    public partial class FormMain : Form
+    partial class FormMain : Form
     {
-
-        List<Medicine> medicines = new List<Medicine>();
-        List<Customer> customers = new List<Customer>();
-        List<CartItem> buyings = new List<CartItem>();
-        List<RewardItem> rewards = new List<RewardItem>();
-        List<Invoice> invoices = new List<Invoice>();
-
+        private List<Medicine> medicines = new List<Medicine>();
+        private List<Customer> customers = new List<Customer>();
+        private List<CartItem> buyings = new List<CartItem>();
+        private List<RewardItem> rewards = new List<RewardItem>();
+        private List<Invoice> invoices = new List<Invoice>();
+        private int pointRate = 1000; // Mặc định 1.000 VNĐ = 1 điểm tích lũy
 
         public FormMain()
         {
             InitializeComponent();
 
-            find.Enabled = false;
             register.Enabled = false;
             addProduct.Enabled = false;
             calc.Enabled = false;
 
             invoices = DataManager.LoadInvoices();
-            LoadCustomers();
+            customers = DataManager.LoadCustomers();
+            medicines = DataManager.LoadMedicines();
+            rewards = DataManager.LoadRewards();
+
+            if (customers.Count < 20 || medicines.Count < 15 || invoices.Count < 20)
+            {
+                DataManager.GenerateRichSampleDataIfEmpty();
+                invoices = DataManager.LoadInvoices();
+                customers = DataManager.LoadCustomers();
+                medicines = DataManager.LoadMedicines();
+                rewards = DataManager.LoadRewards();
+            }
+
+            if (cboUnit.Items.Count > 0 && cboUnit.SelectedIndex < 0) cboUnit.SelectedIndex = 0;
+            ShowAllCustomers();
             LoadLeaderboard();
-            LoadMedicines();
-            LoadRewards();
+            CapNhatComboboxThuoc();
+            CapNhatComboboxQua();
 
             menuPro.DataSource = buyings;
-            customer.DataSource = customers;
+            FormatCartGridHeaders();
 
             proBox.DropDownStyle = ComboBoxStyle.DropDown;
             proBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
@@ -39,42 +56,100 @@ namespace QuanLyNhaThuoc
             nudQuantity.KeyDown += nudQuantity_KeyDown;
 
             SetupContextMenu();
+            KhoiTaoComboboxBaoCao();
+        }
+
+        private void FormMain_Load(object sender, EventArgs e)
+        {
+            FormatCartGridHeaders();
+            FormatCustomerGridHeaders();
+            FormatLeaderboardHeaders();
+            CapNhatBaoCaoThang();
+        }
+
+        private void FormatCustomerGridHeaders()
+        {
+            if (customer.Columns["Name"] != null) customer.Columns["Name"].HeaderText = "Họ Và Tên Khách Hàng";
+            if (customer.Columns["NumPhone"] != null) customer.Columns["NumPhone"].HeaderText = "Số Điện Thoại";
+            if (customer.Columns["Point"] != null) customer.Columns["Point"].HeaderText = "Điểm Tích Lũy";
+        }
+
+        private void FormatLeaderboardHeaders()
+        {
+            if (leaderboard.Columns["Name"] != null) leaderboard.Columns["Name"].HeaderText = "Họ Và Tên Khách VIP";
+            if (leaderboard.Columns["NumPhone"] != null) leaderboard.Columns["NumPhone"].HeaderText = "Số Điện Thoại";
+            if (leaderboard.Columns["Point"] != null) leaderboard.Columns["Point"].HeaderText = "Điểm Tích Lũy";
+        }
+
+        private void FormatCartGridHeaders()
+        {
+            if (menuPro.Columns["Name"] != null) menuPro.Columns["Name"].HeaderText = "Tên Thuốc";
+            if (menuPro.Columns["Price"] != null) menuPro.Columns["Price"].HeaderText = "Đơn Giá (VNĐ)";
+            if (menuPro.Columns["SelectedUnit"] != null) menuPro.Columns["SelectedUnit"].HeaderText = "Đơn Vị Tính";
+            if (menuPro.Columns["Quantity"] != null) menuPro.Columns["Quantity"].HeaderText = "Số Lượng";
+            if (menuPro.Columns["TotalPrice"] != null) menuPro.Columns["TotalPrice"].HeaderText = "Thành Tiền (VNĐ)";
         }
 
         private void ShowAllCustomers()
         {
             customer.DataSource = null;
             customer.DataSource = customers;
+            FormatCustomerGridHeaders();
         }
 
+        // --- TRA CỨU TỰ ĐỘNG REAL-TIME KHI GÕ (BỎ NÚT TRA CỨU) ---
         private void sdtBox_TextChanged(object sender, EventArgs e)
         {
-            find.Enabled = !string.IsNullOrWhiteSpace(sdtBox.Text);
             CheckInput_Register();
             CheckInput_Calc();
-
-            if (string.IsNullOrWhiteSpace(sdtBox.Text))
-            {
-                ShowAllCustomers();
-            }
-
+            ThucHienTimKiemRealtime();
         }
+
         private void nameBox_TextChanged(object sender, EventArgs e)
         {
             CheckInput_Register();
-            find.Enabled = !string.IsNullOrWhiteSpace(nameBox.Text);
             CheckInput_Calc();
-            if (string.IsNullOrWhiteSpace(nameBox.Text))
+            ThucHienTimKiemRealtime();
+        }
+
+        private void ThucHienTimKiemRealtime()
+        {
+            string sdtStr = sdtBox.Text.Trim();
+            string nameStr = nameBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(sdtStr) && string.IsNullOrWhiteSpace(nameStr))
             {
                 ShowAllCustomers();
+                txtEditPoint.Text = "0";
+                return;
             }
 
+            var dsMatch = customers.Where(x =>
+                (string.IsNullOrWhiteSpace(sdtStr) || x.NumPhone.Contains(sdtStr, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrWhiteSpace(nameStr) || x.Name.Contains(nameStr, StringComparison.OrdinalIgnoreCase))
+            ).ToList();
+
+            customer.DataSource = null;
+            customer.DataSource = dsMatch;
+            FormatCustomerGridHeaders();
+
+            if (dsMatch.Count == 1)
+            {
+                txtEditPoint.Text = dsMatch[0].Point.ToString();
+            }
+            else
+            {
+                Customer? exact = dsMatch.FirstOrDefault(x => x.NumPhone.Equals(sdtStr, StringComparison.OrdinalIgnoreCase));
+                if (exact != null)
+                {
+                    txtEditPoint.Text = exact.Point.ToString();
+                }
+            }
         }
+
         private void CheckInput_Register()
         {
-            register.Enabled =
-                !string.IsNullOrWhiteSpace(nameBox.Text) &&
-                !string.IsNullOrWhiteSpace(sdtBox.Text);
+            register.Enabled = !string.IsNullOrWhiteSpace(nameBox.Text) && !string.IsNullOrWhiteSpace(sdtBox.Text);
         }
 
         private void CheckInput_Product()
@@ -88,7 +163,7 @@ namespace QuanLyNhaThuoc
                     return;
                 }
 
-                addProduct.Enabled = medicines.Any(x => x.Name.Equals(text, StringComparison.OrdinalIgnoreCase));
+                addProduct.Enabled = medicines.Any(x => x.Name.Equals(text, StringComparison.OrdinalIgnoreCase) || x.ToString().Equals(text, StringComparison.OrdinalIgnoreCase));
             }
             catch
             {
@@ -106,24 +181,13 @@ namespace QuanLyNhaThuoc
             CheckInput_Product();
         }
 
-        private void proBox_TextUpdate(object sender, EventArgs e)
-        {
-            CheckInput_Product();
-        }
-
         private void proBox_KeyDown(object? sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                e.SuppressKeyPress = true; // Chặn tiếng kêu bíp hệ thống WinForms
-                if (addProduct.Enabled)
-                {
-                    addPro_Click(sender, e);
-                }
-                else
-                {
-                    nudQuantity.Focus();
-                }
+                e.SuppressKeyPress = true;
+                if (addProduct.Enabled) addPro_Click(sender, e);
+                else nudQuantity.Focus();
             }
         }
 
@@ -131,22 +195,17 @@ namespace QuanLyNhaThuoc
         {
             if (e.KeyCode == Keys.Enter)
             {
-                e.SuppressKeyPress = true; // Chặn tiếng kêu bíp hệ thống WinForms
-                if (addProduct.Enabled)
-                {
-                    addPro_Click(sender, e);
-                }
+                e.SuppressKeyPress = true;
+                if (addProduct.Enabled) addPro_Click(sender, e);
             }
         }
 
         private void UpdateTotal()
         {
             float totalMoney = buyings.Sum(x => x.TotalPrice);
-
             money.Text = $"{totalMoney:N0}đ";
 
-            int totalPoint = (int)(totalMoney / 1000);
-
+            int totalPoint = (int)(totalMoney / pointRate);
             points.Text = totalPoint.ToString();
         }
 
@@ -154,31 +213,40 @@ namespace QuanLyNhaThuoc
         {
             string name = proBox.Text.Trim();
             int qty = (int)nudQuantity.Value;
+            string selectedUnit = cboUnit.SelectedItem?.ToString() ?? "Hộp";
 
-            Medicine? medicine = medicines.FirstOrDefault(
-                x => x.Name.Equals(
-                    name,
-                    StringComparison.OrdinalIgnoreCase)
+            Medicine? medicine = medicines.FirstOrDefault(x =>
+                x.Name.Equals(name, StringComparison.OrdinalIgnoreCase) ||
+                x.ToString().Equals(name, StringComparison.OrdinalIgnoreCase)
             );
 
             if (medicine == null)
             {
-                MessageBox.Show("Vui lòng chọn một thuốc hợp lệ!");
+                MessageBox.Show("Vui lòng chọn một thuốc hợp lệ từ danh sách kho!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            CartItem? existingItem = buyings.FirstOrDefault(x => x.Name.Equals(medicine.Name, StringComparison.OrdinalIgnoreCase));
+            float unitPrice = medicine.GetPriceByUnit(selectedUnit);
+
+            // Trừ số lượng tồn kho thuốc (1 Hộp)
+            medicine.StockQuantity -= 1;
+
+            CartItem? existingItem = buyings.FirstOrDefault(x => x.Name.Equals(medicine.Name, StringComparison.OrdinalIgnoreCase) && x.SelectedUnit.Equals(selectedUnit, StringComparison.OrdinalIgnoreCase));
             if (existingItem != null)
             {
                 existingItem.Quantity += qty;
             }
             else
             {
-                buyings.Add(new CartItem(medicine.Name, medicine.Price, qty));
+                buyings.Add(new CartItem(medicine.Name, unitPrice, qty, selectedUnit));
             }
 
             menuPro.DataSource = null;
             menuPro.DataSource = buyings;
+            FormatCartGridHeaders();
+
+            DataManager.SaveMedicines(medicines);
+            CapNhatComboboxThuoc();
 
             UpdateTotal();
             CheckInput_Calc();
@@ -187,84 +255,81 @@ namespace QuanLyNhaThuoc
             nudQuantity.Value = 1;
             proBox.Focus();
         }
-        private void find_Click(object sender, EventArgs e)
-        {
-            string sdt = sdtBox.Text.Trim();
-            string name = nameBox.Text.Trim();
-
-            var result = customers.Where(x =>
-                (string.IsNullOrWhiteSpace(sdt) ||
-                 x.NumPhone.Contains(sdt)) &&
-
-                (string.IsNullOrWhiteSpace(name) ||
-                 x.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
-            ).ToList();
-
-            customer.DataSource = null;
-            customer.DataSource = result;
-        }
 
         private void LoadLeaderboard()
         {
             var ranking = customers.OrderByDescending(x => x.Point).ToList();
             leaderboard.DataSource = null;
             leaderboard.DataSource = ranking;
+            FormatLeaderboardHeaders();
         }
 
         private int GetCurrentPoint()
         {
             float totalMoney = buyings.Sum(x => x.TotalPrice);
-
-            return (int)(totalMoney / 1000);
+            return (int)(totalMoney / pointRate);
         }
-
 
         private void calc_Click(object sender, EventArgs e)
         {
-            string sdt = sdtBox.Text.Trim();
-            string name = nameBox.Text.Trim();
-
-            // Kiểm tra thông tin nhập vào
-            if (string.IsNullOrWhiteSpace(sdt) ||
-                string.IsNullOrWhiteSpace(name))
-            {
-                MessageBox.Show(
-                    "Vui lòng nhập đầy đủ SĐT và Họ tên!",
-                    "Thông báo",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                );
-
-                return;
-            }
-
-            // Kiểm tra có thuốc đang mua hay chưa
             if (buyings.Count == 0)
             {
-                MessageBox.Show(
-                    "Chưa có thuốc nào trong danh sách mua!",
-                    "Thông báo",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                );
-
+                MessageBox.Show("Chưa có thuốc nào trong đơn hàng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // Tính điểm của hóa đơn hiện tại
+            string sdtStr = sdtBox.Text.Trim();
+            string nameStr = nameBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(sdtStr) || string.IsNullOrWhiteSpace(nameStr))
+            {
+                FormCustomerChoice choiceForm = new FormCustomerChoice();
+                choiceForm.ShowDialog();
+
+                if (choiceForm.SelectedMode == CustomerChoiceMode.NewCustomer)
+                {
+                    string newSdt = Microsoft.VisualBasic.Interaction.InputBox("Nhập SỐ ĐIỆN THOẠI khách hàng mới:", "Đăng Ký Khách Mới", sdtStr);
+                    if (string.IsNullOrWhiteSpace(newSdt)) return;
+
+                    string newName = Microsoft.VisualBasic.Interaction.InputBox("Nhập HỌ VÀ TÊN khách hàng mới:", "Đăng Ký Khách Mới", nameStr);
+                    if (string.IsNullOrWhiteSpace(newName)) return;
+
+                    sdtBox.Text = newSdt;
+                    nameBox.Text = newName;
+                    sdtStr = newSdt.Trim();
+                    nameStr = newName.Trim();
+                }
+                else if (choiceForm.SelectedMode == CustomerChoiceMode.ExistingCustomer)
+                {
+                    tabCustomer.SelectedTab = tabList;
+                    MessageBox.Show("Vui lòng chọn khách hàng trong danh sách ở khung bên phải hoặc nhập SĐT!", "Hướng dẫn", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    sdtBox.Focus();
+                    return;
+                }
+                else if (choiceForm.SelectedMode == CustomerChoiceMode.GuestCheckout)
+                {
+                    sdtBox.Text = "0000000000";
+                    nameBox.Text = "Khách Vãng Lai";
+                    sdtStr = "0000000000";
+                    nameStr = "Khách Vãng Lai";
+                }
+                else
+                {
+                    return; // Cancel
+                }
+            }
+
             int newPoint = GetCurrentPoint();
+            if (sdtStr == "0000000000") newPoint = 0; // Khách vãng lai không tích điểm
 
-            // Tìm khách hàng theo SĐT
-            Customer? customerFound = customers.FirstOrDefault(
-                x => x.NumPhone == sdt
-            );
+            Customer? customerFound = customers.FirstOrDefault(x => x.NumPhone == sdtStr);
 
-            // =========================
-            // TRƯỜNG HỢP KHÁCH ĐÃ CÓ
-            // =========================
             if (customerFound != null)
             {
-                customerFound.Point += newPoint;
+                if (customerFound.NumPhone != "0000000000")
+                {
+                    customerFound.Point += newPoint;
+                }
 
                 float totalMoney = buyings.Sum(x => x.TotalPrice);
                 string invId = "HD" + DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -274,81 +339,65 @@ namespace QuanLyNhaThuoc
                 DataManager.SaveInvoices(invoices);
                 DataManager.SaveCustomers(customers);
 
-                MessageBox.Show(
-                    $"Khách hàng: {customerFound.Name}\n" +
-                    $"SĐT: {customerFound.NumPhone}\n\n" +
-                    $"➕ Điểm tích lũy thêm: +{newPoint}\n" +
-                    $"🌟 Tổng điểm hiện tại: {customerFound.Point}\n\n" +
-                    $"📜 Đã lưu hóa đơn {invId} vào Lịch sử mua hàng!",
-                    "Thanh toán thành công",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information
-                );
+                string thongBao = customerFound.NumPhone == "0000000000"
+                    ? $"THANH TOÁN THÀNH CÔNG (KHÁCH VÃNG LAI)!\n\n" +
+                      $"• Tổng tiền: {totalMoney:N0}đ\n" +
+                      $"• Đã lưu hóa đơn {invId}!"
+                    : $"THANH TOÁN THÀNH CÔNG!\n\n" +
+                      $"• Khách hàng: {customerFound.Name}\n" +
+                      $"• SĐT: {customerFound.NumPhone}\n" +
+                      $"• Tổng tiền: {totalMoney:N0}đ\n" +
+                      $"• Điểm tích lũy nhận được: +{newPoint} điểm\n" +
+                      $"• Tổng điểm hiện tại: {customerFound.Point} điểm\n\n" +
+                      $"• Đã lưu hóa đơn {invId}!";
+
+                MessageBox.Show(thongBao, "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 ShowAllCustomers();
                 LoadLeaderboard();
+                CapNhatBaoCaoThang();
                 ClearBill();
                 return;
             }
 
-            // =========================
-            // KHÁCH CHƯA CÓ
-            // =========================
-            DialogResult result = MessageBox.Show(
-                $"Không tìm thấy khách hàng trong hệ thống.\n\n" +
-                $"SĐT: {sdt}\n" +
-                $"Họ tên: {name}\n\n" +
-                $"Bạn có muốn đăng ký khách hàng mới không?",
-                "Khách hàng mới",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question
+            // Đăng ký khách hàng mới hoàn toàn
+            Customer newCustomer = new Customer(nameStr, sdtStr, newPoint);
+            customers.Add(newCustomer);
+
+            float moneyTotal = buyings.Sum(x => x.TotalPrice);
+            string idInv = "HD" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            Invoice invoiceNew = new Invoice(idInv, newCustomer.NumPhone, newCustomer.Name, DateTime.Now, new List<CartItem>(buyings), moneyTotal, newPoint);
+            invoices.Add(invoiceNew);
+
+            DataManager.SaveInvoices(invoices);
+            DataManager.SaveCustomers(customers);
+
+            ShowAllCustomers();
+            LoadLeaderboard();
+            CapNhatBaoCaoThang();
+
+            MessageBox.Show(
+                $"ĐÃ ĐĂNG KÝ KHÁCH MỚI VÀ TÍCH ĐIỂM THÀNH CÔNG!\n\n" +
+                $"• Họ tên: {nameStr}\n" +
+                $"• SĐT: {sdtStr}\n" +
+                $"• Điểm tích lũy: {newPoint} điểm\n\n" +
+                $"• Đã lưu hóa đơn {idInv}!",
+                "Thành công",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
             );
-
-            if (result == DialogResult.Yes)
-            {
-                Customer newCustomer = new Customer(
-                    name,
-                    sdt,
-                    newPoint
-                );
-
-                customers.Add(newCustomer);
-
-                float totalMoney = buyings.Sum(x => x.TotalPrice);
-                string invId = "HD" + DateTime.Now.ToString("yyyyMMddHHmmss");
-                Invoice inv = new Invoice(invId, newCustomer.NumPhone, newCustomer.Name, DateTime.Now, new List<CartItem>(buyings), totalMoney, newPoint);
-                invoices.Add(inv);
-
-                DataManager.SaveInvoices(invoices);
-                DataManager.SaveCustomers(customers);
-
-                ShowAllCustomers();
-                LoadLeaderboard();
-
-                MessageBox.Show(
-                    $"Đã đăng ký khách hàng mới!\n\n" +
-                    $"Họ tên: {name}\n" +
-                    $"SĐT: {sdt}\n" +
-                    $"Điểm tích lũy: {newPoint}\n\n" +
-                    $"📜 Đã lưu hóa đơn {invId} vào Lịch sử mua hàng!",
-                    "Đăng ký thành công",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information
-                );
-            }
             ClearBill();
         }
 
         private void ClearBill()
         {
             buyings.Clear();
-
             menuPro.DataSource = null;
             menuPro.DataSource = buyings;
+            FormatCartGridHeaders();
 
             money.Text = "0đ";
             points.Text = "0";
-
             proBox.Text = "";
             sdtBox.Clear();
             nameBox.Clear();
@@ -358,77 +407,40 @@ namespace QuanLyNhaThuoc
 
         private void register_Click(object sender, EventArgs e)
         {
-            string sdt = sdtBox.Text.Trim();
+            string sdtStr = sdtBox.Text.Trim();
             string hoTen = nameBox.Text.Trim();
 
-            // Kiểm tra số điện thoại
-            if (!Regex.IsMatch(sdt, @"^0\d{9}$"))
+            if (!Regex.IsMatch(sdtStr, @"^0\d{8,10}$"))
             {
-                MessageBox.Show(
-                    "Số điện thoại phải có đúng 10 chữ số và đúng cú pháp!",
-                    "Lỗi",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                );
-
+                MessageBox.Show("Số điện thoại không hợp lệ!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 sdtBox.Focus();
                 return;
             }
 
-            // Kiểm tra họ tên
-            if (!Regex.IsMatch(hoTen, @"^[\p{L}\s]+$"))
+            if (string.IsNullOrWhiteSpace(hoTen))
             {
-                MessageBox.Show(
-                    "Họ và tên chỉ được chứa chữ cái và khoảng trắng!",
-                    "Lỗi",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                );
-
+                MessageBox.Show("Họ và tên không được để trống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 nameBox.Focus();
                 return;
             }
 
-            // Kiểm tra số điện thoại đã tồn tại
-            if (customers.Any(x => x.NumPhone == sdt))
+            if (customers.Any(x => x.NumPhone == sdtStr))
             {
-                MessageBox.Show(
-                    "Số điện thoại này đã được đăng ký!",
-                    "Lỗi",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                );
-
+                MessageBox.Show("Số điện thoại này đã được đăng ký!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 sdtBox.Focus();
                 return;
             }
 
-            // Tạo khách hàng mới
-            Customer customerNew = new Customer
-            {
-                Name = hoTen,
-                NumPhone = sdt,
-                Point = 0
-            };
-
+            Customer customerNew = new Customer(hoTen, sdtStr, 0);
             customers.Add(customerNew);
             DataManager.SaveCustomers(customers);
 
-            // Cập nhật DataGridView khách hàng
-            customer.DataSource = null;
-            customer.DataSource = customers;
-
-            // Cập nhật bảng xếp hạng
+            ShowAllCustomers();
             LoadLeaderboard();
+            CapNhatBaoCaoThang();
 
-            MessageBox.Show(
-                "Đăng ký khách hàng thành công!",
-                "Thông báo",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information
-            );
+            MessageBox.Show("Đăng ký khách hàng mới thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            // Xóa dữ liệu sau khi đăng ký
             sdtBox.Clear();
             nameBox.Clear();
         }
@@ -448,22 +460,18 @@ namespace QuanLyNhaThuoc
 
         private void OpenEditCustomerDialog()
         {
-            string sdt = sdtBox.Text.Trim();
-            Customer? targetCust = customers.FirstOrDefault(x => x.NumPhone == sdt);
+            string sdtStr = sdtBox.Text.Trim();
+            Customer? targetCust = customers.FirstOrDefault(x => x.NumPhone == sdtStr);
 
             if (targetCust == null && customer.SelectedRows.Count > 0)
-            {
                 targetCust = customer.SelectedRows[0].DataBoundItem as Customer;
-            }
 
             if (targetCust == null && leaderboard.SelectedRows.Count > 0)
-            {
                 targetCust = leaderboard.SelectedRows[0].DataBoundItem as Customer;
-            }
 
             if (targetCust == null)
             {
-                MessageBox.Show("Vui lòng chọn một khách hàng trong danh sách hoặc nhập SĐT để chỉnh sửa thông tin!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn hoặc nhập SĐT khách hàng cần sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -478,28 +486,24 @@ namespace QuanLyNhaThuoc
                 ShowAllCustomers();
                 LoadLeaderboard();
 
-                MessageBox.Show($"Cập nhật toàn bộ thông tin thành công cho khách hàng: {targetCust.Name}!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Cập nhật thông tin khách hàng thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
         private void OpenCustomerHistory()
         {
-            string sdt = sdtBox.Text.Trim();
-            Customer? targetCust = customers.FirstOrDefault(x => x.NumPhone == sdt);
+            string sdtStr = sdtBox.Text.Trim();
+            Customer? targetCust = customers.FirstOrDefault(x => x.NumPhone == sdtStr);
 
             if (targetCust == null && customer.SelectedRows.Count > 0)
-            {
                 targetCust = customer.SelectedRows[0].DataBoundItem as Customer;
-            }
 
             if (targetCust == null && leaderboard.SelectedRows.Count > 0)
-            {
                 targetCust = leaderboard.SelectedRows[0].DataBoundItem as Customer;
-            }
 
             if (targetCust == null)
             {
-                MessageBox.Show("Vui lòng chọn một khách hàng trong danh sách hoặc nhập SĐT để xem lịch sử mua hàng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn một khách hàng để xem lịch sử mua hàng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -512,361 +516,381 @@ namespace QuanLyNhaThuoc
             OpenEditCustomerDialog();
         }
 
-        // =========================================================================
-        // 🖱️ THÀNH PHẦN MENU CHUỘT PHẢI (CONTEXT MENU STRIP) CHO DATAGRIDVIEW
-        // =========================================================================
-        private ContextMenuStrip cmsCustomer = new ContextMenuStrip();
-        private ContextMenuStrip cmsCart = new ContextMenuStrip();
-
         private void SetupContextMenu()
         {
-            // --- Context Menu cho Bảng Khách Hàng / Bảng Xếp Hạng ---
-            ToolStripMenuItem tsmiHistory = new ToolStripMenuItem("📜 Xem lịch sử mua hàng của khách hàng này");
-            ToolStripMenuItem tsmiEdit = new ToolStripMenuItem("✏️ Sửa toàn bộ thông tin khách hàng (Tên, SĐT, Điểm)");
-            ToolStripMenuItem tsmiSelect = new ToolStripMenuItem("💳 Chọn khách hàng này để thanh toán");
-            ToolStripMenuItem tsmiDelete = new ToolStripMenuItem("🗑️ Xóa khách hàng này");
+            ContextMenuStrip cmsCust = new ContextMenuStrip();
+            ToolStripMenuItem tsmiHistory = new ToolStripMenuItem("Xem lịch sử mua hàng của khách hàng này");
+            ToolStripMenuItem tsmiEdit = new ToolStripMenuItem("Chỉnh sửa tên / SĐT khách hàng");
+            ToolStripMenuItem tsmiDelete = new ToolStripMenuItem("Xóa khách hàng này");
 
             tsmiHistory.Click += (s, e) => OpenCustomerHistory();
             tsmiEdit.Click += (s, e) => OpenEditCustomerDialog();
-            tsmiSelect.Click += (s, e) => CheckInput_Calc();
             tsmiDelete.Click += TsmiDelete_Click;
 
-            cmsCustomer.Items.Add(tsmiHistory);
-            cmsCustomer.Items.Add(tsmiEdit);
-            cmsCustomer.Items.Add(tsmiSelect);
-            cmsCustomer.Items.Add(new ToolStripSeparator());
-            cmsCustomer.Items.Add(tsmiDelete);
+            cmsCust.Items.Add(tsmiHistory);
+            cmsCust.Items.Add(tsmiEdit);
+            cmsCust.Items.Add(new ToolStripSeparator());
+            cmsCust.Items.Add(tsmiDelete);
 
-            customer.ContextMenuStrip = cmsCustomer;
-            leaderboard.ContextMenuStrip = cmsCustomer;
+            customer.ContextMenuStrip = cmsCust;
+            leaderboard.ContextMenuStrip = cmsCust;
 
-            customer.CellMouseDown += Customer_CellMouseDown;
-            leaderboard.CellMouseDown += Leaderboard_CellMouseDown;
+            // Context menu cho giỏ hàng (menuPro)
+            ContextMenuStrip cmsCart = new ContextMenuStrip();
+            ToolStripMenuItem tsmiDetail = new ToolStripMenuItem("Xem thông tin & Chỉnh sửa thuốc");
+            ToolStripMenuItem tsmiRemoveCart = new ToolStripMenuItem("Xóa thuốc khỏi đơn hàng");
 
-            // --- Context Menu cho Bảng Giỏ Hàng Thuốc ---
-            ToolStripMenuItem tsmiRemoveItem = new ToolStripMenuItem("🗑️ Xóa thuốc này khỏi giỏ hàng");
-            ToolStripMenuItem tsmiClearAll = new ToolStripMenuItem("🧹 Xóa toàn bộ giỏ hàng");
+            tsmiDetail.Click += (s, e) => OpenEditCartItemDialog();
+            tsmiRemoveCart.Click += (s, e) => XoaThuocKhoiGioHang();
 
-            tsmiRemoveItem.Click += TsmiRemoveItem_Click;
-            tsmiClearAll.Click += (s, e) => ClearBill();
-
-            cmsCart.Items.Add(tsmiRemoveItem);
-            cmsCart.Items.Add(tsmiClearAll);
+            cmsCart.Items.Add(tsmiDetail);
+            cmsCart.Items.Add(new ToolStripSeparator());
+            cmsCart.Items.Add(tsmiRemoveCart);
 
             menuPro.ContextMenuStrip = cmsCart;
-            menuPro.CellMouseDown += MenuPro_CellMouseDown;
+            menuPro.CellMouseDoubleClick += MenuPro_CellMouseDoubleClick;
         }
 
-        private void Customer_CellMouseDown(object? sender, DataGridViewCellMouseEventArgs e)
+        private void MenuPro_CellMouseDoubleClick(object? sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.RowIndex < customer.Rows.Count)
+            if (e.RowIndex >= 0 && e.RowIndex < buyings.Count)
             {
-                customer.ClearSelection();
-                customer.Rows[e.RowIndex].Selected = true;
-
-                if (customer.Rows[e.RowIndex].DataBoundItem is Customer cust)
-                {
-                    nameBox.Text = cust.Name;
-                    sdtBox.Text = cust.NumPhone;
-                    txtEditPoint.Text = cust.Point.ToString();
-                }
+                OpenEditCartItemDialog(e.RowIndex);
             }
         }
 
-        private void Leaderboard_CellMouseDown(object? sender, DataGridViewCellMouseEventArgs e)
+        private CartItem? GetSelectedCartItem(int rowIndex = -1)
         {
-            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.RowIndex < leaderboard.Rows.Count)
+            try
             {
-                leaderboard.ClearSelection();
-                leaderboard.Rows[e.RowIndex].Selected = true;
-
-                if (leaderboard.Rows[e.RowIndex].DataBoundItem is Customer cust)
+                if (rowIndex >= 0 && rowIndex < buyings.Count)
                 {
-                    nameBox.Text = cust.Name;
-                    sdtBox.Text = cust.NumPhone;
-                    txtEditPoint.Text = cust.Point.ToString();
+                    return buyings[rowIndex];
                 }
+                if (menuPro.SelectedRows.Count > 0 && menuPro.SelectedRows[0].Index >= 0 && menuPro.SelectedRows[0].Index < buyings.Count)
+                {
+                    return buyings[menuPro.SelectedRows[0].Index];
+                }
+                if (menuPro.CurrentRow != null && menuPro.CurrentRow.Index >= 0 && menuPro.CurrentRow.Index < buyings.Count)
+                {
+                    return buyings[menuPro.CurrentRow.Index];
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        private void OpenEditCartItemDialog(int rowIndex = -1)
+        {
+            CartItem? item = GetSelectedCartItem(rowIndex);
+            if (item == null)
+            {
+                MessageBox.Show("Vui lòng chọn thuốc trong giỏ hàng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            Medicine? med = medicines.FirstOrDefault(x => x.Name.Equals(item.Name, StringComparison.OrdinalIgnoreCase));
+
+            FormEditCartItem editForm = new FormEditCartItem(item, med);
+            DialogResult res = editForm.ShowDialog();
+
+            if (res == DialogResult.OK)
+            {
+                menuPro.DataSource = null;
+                menuPro.DataSource = buyings;
+                FormatCartGridHeaders();
+                UpdateTotal();
+            }
+            else if (res == DialogResult.Yes)
+            {
+                if (med != null)
+                {
+                    med.StockQuantity += 1;
+                }
+
+                buyings.Remove(item);
+                menuPro.DataSource = null;
+                menuPro.DataSource = buyings;
+                FormatCartGridHeaders();
+
+                UpdateTotal();
+                CheckInput_Calc();
             }
         }
 
-        private void MenuPro_CellMouseDown(object? sender, DataGridViewCellMouseEventArgs e)
+        private void XoaThuocKhoiGioHang()
         {
-            if (e.Button == MouseButtons.Right && e.RowIndex >= 0 && e.RowIndex < menuPro.Rows.Count)
+            CartItem? item = GetSelectedCartItem();
+            if (item == null)
             {
-                menuPro.ClearSelection();
-                menuPro.Rows[e.RowIndex].Selected = true;
+                MessageBox.Show("Vui lòng chọn thuốc cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var dr = MessageBox.Show($"Bạn có chắc chắn muốn xóa '{item.Name}' khỏi đơn hàng?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dr == DialogResult.Yes)
+            {
+                Medicine? med = medicines.FirstOrDefault(x => x.Name.Equals(item.Name, StringComparison.OrdinalIgnoreCase));
+                if (med != null)
+                {
+                    med.StockQuantity += 1;
+                }
+
+                buyings.Remove(item);
+                menuPro.DataSource = null;
+                menuPro.DataSource = buyings;
+
+                UpdateTotal();
+                CheckInput_Calc();
+                MessageBox.Show($"Đã xóa '{item.Name}' khỏi đơn hàng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
         private void TsmiDelete_Click(object? sender, EventArgs e)
         {
-            string sdt = sdtBox.Text.Trim();
-            string name = nameBox.Text.Trim();
+            string sdtStr = sdtBox.Text.Trim();
+            string nameStr = nameBox.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(sdt))
+            if (string.IsNullOrWhiteSpace(sdtStr))
             {
                 MessageBox.Show("Vui lòng chọn khách hàng muốn xóa!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var dialog = MessageBox.Show($"Bạn có chắc chắn muốn xóa khách hàng {name} (SĐT: {sdt}) khỏi hệ thống?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var dialog = MessageBox.Show($"Bạn có chắc chắn muốn xóa khách hàng {nameStr} (SĐT: {sdtStr})?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dialog == DialogResult.Yes)
             {
-                customers.RemoveAll(x => x.NumPhone == sdt);
+                customers.RemoveAll(x => x.NumPhone == sdtStr);
+                DataManager.SaveCustomers(customers);
+
                 ShowAllCustomers();
                 LoadLeaderboard();
+                CapNhatBaoCaoThang();
 
                 sdtBox.Clear();
                 nameBox.Clear();
                 txtEditPoint.Clear();
 
-                MessageBox.Show($"Đã xóa thành công khách hàng {name}!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Đã xóa khách hàng thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
-        private void TsmiRemoveItem_Click(object? sender, EventArgs e)
+        private void CapNhatComboboxThuoc()
         {
-            if (menuPro.SelectedRows.Count > 0)
-            {
-                int index = menuPro.SelectedRows[0].Index;
-                if (index >= 0 && index < buyings.Count)
-                {
-                    buyings.RemoveAt(index);
-                    menuPro.DataSource = null;
-                    menuPro.DataSource = buyings;
-                    UpdateTotal();
-                    CheckInput_Calc();
-                }
-            }
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-        }
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
-
-
-
-        private void LoadMedicines()
-        {
-            string data = @"
-            Paracetamol|2000
-            Aspirin|1500
-            Ibuprofen|3000
-            Amoxicillin|5000
-            Azithromycin|8000
-            Cephalexin|6000
-            Cefuroxime|10000
-            Cefixime|12000
-            Metformin|2500
-            Glimepiride|4000
-            Amlodipine|3000
-            Losartan|3500
-            Enalapril|2500
-            Omeprazole|4000
-            Esomeprazole|6000
-            Lansoprazole|5000
-            Pantoprazole|5500
-            Domperidone|3000
-            Smecta|5000
-            Berocca|7000
-            Vitamin C|2000
-            Vitamin B1|1500
-            Vitamin B6|1500
-            Vitamin B12|2000
-            Calcium|3000
-            Magnesium|2500
-            Kẽm|2000
-            Sắt|3000
-            Dầu cá Omega 3|5000
-            Cetirizine|2500
-            Loratadine|3000
-            Fexofenadine|4000
-            Chlorpheniramine|1500
-            Salbutamol|2500
-            Dextromethorphan|3000
-            Guaifenesin|2500
-            Acetylcysteine|4000
-            Bromhexine|2500
-            Ambroxol|3000
-            Povidone Iodine|5000
-            Oresol|3000
-            Berberin|2000
-            Than hoạt tính|2500
-            Men tiêu hóa|3000
-            Loperamide|2500
-            Bisacodyl|2000
-            Magnesi hydroxide|3000
-            Diclofenac|3500
-            Naproxen|4000
-            Ketoprofen|4500
-            ";
-
-            string[] lines = data.Trim().Split('\n');
-
-            foreach (string line in lines)
-            {
-                string[] parts = line.Trim().Split('|');
-
-                if (parts.Length == 2 &&
-                    float.TryParse(parts[1], out float price))
-                {
-                    medicines.Add(new Medicine(parts[0], price));
-                }
-            }
-
             proBox.Items.Clear();
             AutoCompleteStringCollection autoSource = new AutoCompleteStringCollection();
             foreach (var m in medicines)
             {
-                proBox.Items.Add(m.Name);
+                proBox.Items.Add(m.ToString());
                 autoSource.Add(m.Name);
+                autoSource.Add(m.ToString());
             }
-            proBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            proBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
             proBox.AutoCompleteCustomSource = autoSource;
         }
-        private void LoadCustomers()
-        {
-            customers.Add(new Customer("Nguyễn Văn An", "0901234567", 125));
-            customers.Add(new Customer("Trần Thị Bình", "0912345678", 87));
-            customers.Add(new Customer("Lê Văn Cường", "0923456789", 215));
-            customers.Add(new Customer("Phạm Thị Dung", "0934567890", 56));
-            customers.Add(new Customer("Hoàng Văn Đức", "0945678901", 178));
-            customers.Add(new Customer("Vũ Thị Hoa", "0956789012", 320));
-            customers.Add(new Customer("Đặng Văn Hùng", "0967890123", 42));
-            customers.Add(new Customer("Bùi Thị Lan", "0978901234", 156));
-            customers.Add(new Customer("Ngô Văn Minh", "0989012345", 93));
-            customers.Add(new Customer("Đỗ Thị Ngọc", "0990123456", 267));
-        }
 
-        private void LoadRewards()
+        private void CapNhatComboboxQua()
         {
-            rewards.Clear();
-            rewards.Add(new RewardItem("Khẩu trang y tế 4 lớp (50 cái)", 50));
-            rewards.Add(new RewardItem("Chai Xịt khuẩn Hand Sanitizer 100ml", 80));
-            rewards.Add(new RewardItem("Hộp Băng cá nhân Urgo (100 miếng)", 100));
-            rewards.Add(new RewardItem("Voucher Giảm 50.000đ Tiền Thuốc", 150));
-            rewards.Add(new RewardItem("Máy Đo Huyết Áp Điện Tử Omron", 500));
-            rewards.Add(new RewardItem("Bộ Thể Thao / Áo Phông VIP", 1000));
-
             cboRewards.DataSource = null;
             cboRewards.DataSource = rewards;
+            cboRewards.DisplayMember = "ToString";
+            if (cboRewards.Items.Count > 0) cboRewards.SelectedIndex = 0;
+        }
+
+        private void btnConfigRate_Click(object sender, EventArgs e)
+        {
+            string input = Microsoft.VisualBasic.Interaction.InputBox(
+                "Nhập số tiền VNĐ cần có để đổi được 1 điểm tích lũy:\n(Ví dụ: 1000 = 1.000 VNĐ được 1 điểm)",
+                "Cấu hình tỷ lệ tích điểm",
+                pointRate.ToString()
+            );
+
+            if (int.TryParse(input, out int rateMoi) && rateMoi > 0)
+            {
+                pointRate = rateMoi;
+                MessageBox.Show($"Đã cập nhật quy tắc tích điểm mới:\n• {pointRate:N0} VNĐ tiền thuốc = 1 Điểm tích lũy", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                UpdateTotal();
+            }
         }
 
         private void btnRedeemReward_Click(object sender, EventArgs e)
         {
-            string sdt = sdtBox.Text.Trim();
-            string name = nameBox.Text.Trim();
-
-            if (string.IsNullOrWhiteSpace(sdt))
+            string sdtStr = sdtBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(sdtStr))
             {
-                MessageBox.Show("Vui lòng chọn hoặc nhập SĐT khách hàng muốn đổi quà!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn hoặc nhập SĐT khách hàng đổi quà!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 sdtBox.Focus();
                 return;
             }
 
-            Customer? cust = customers.FirstOrDefault(x => x.NumPhone == sdt);
+            Customer? cust = customers.FirstOrDefault(x => x.NumPhone == sdtStr);
             if (cust == null)
             {
                 MessageBox.Show("Không tìm thấy khách hàng trong hệ thống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            if (cboRewards.SelectedItem is RewardItem selectedReward)
+            RewardItem? reward = cboRewards.SelectedItem as RewardItem;
+            if (reward == null)
             {
-                if (cust.Point >= selectedReward.PointsRequired)
-                {
-                    cust.Point -= selectedReward.PointsRequired;
-                    txtEditPoint.Text = cust.Point.ToString();
-
-                    DataManager.SaveCustomers(customers);
-                    ShowAllCustomers();
-                    LoadLeaderboard();
-
-                    MessageBox.Show(
-                        $"🎁 ĐỔI QUÀ THÀNH CÔNG!\n\n" +
-                        $"Khách hàng: {cust.Name} (SĐT: {cust.NumPhone})\n" +
-                        $"Phần quà nhận: {selectedReward.Name}\n" +
-                        $"Trừ điểm tích lũy: -{selectedReward.PointsRequired} điểm\n" +
-                        $"🌟 Số điểm còn lại: {cust.Point} điểm",
-                        "Đổi Quà Thành Công",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
-                }
-                else
-                {
-                    int missingPoints = selectedReward.PointsRequired - cust.Point;
-                    MessageBox.Show(
-                        $"Khách hàng {cust.Name} không đủ điểm để đổi quà này!\n\n" +
-                        $"• Điểm hiện tại: {cust.Point} điểm\n" +
-                        $"• Yêu cầu: {selectedReward.PointsRequired} điểm\n" +
-                        $"• Còn thiếu: {missingPoints} điểm",
-                        "Không Đủ Điểm",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning
-                    );
-                }
+                MessageBox.Show("Vui lòng chọn quà cần đổi!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
-        }
 
-        private void btnResetNewYear_Click(object sender, EventArgs e)
-        {
-            var confirm = MessageBox.Show(
-                "🎆 XÁC NHẬN RESET ĐIỂM NĂM MỚI\n\n" +
-                "Bạn có chắc chắn muốn RESET TOÀN BỘ ĐIỂM TÍCH LŨY của TẤT CẢ KHÁCH HÀNG về 0 để bắt đầu Niên Độ Năm Mới không?\n\n" +
-                "⚠️ Thao tác này sẽ đặt điểm của tất cả khách hàng về 0!",
-                "Xác Nhận Reset Năm Mới",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning
-            );
-
-            if (confirm == DialogResult.Yes)
+            if (reward.StockQuantity <= 0)
             {
-                foreach (var c in customers)
-                {
-                    c.Point = 0;
-                }
-
-                txtEditPoint.Clear();
-                DataManager.SaveCustomers(customers);
-                ShowAllCustomers();
-                LoadLeaderboard();
-
                 MessageBox.Show(
-                    "🎆 RESET ĐIỂM NĂM MỚI THÀNH CÔNG!\n\n" +
-                    "Toàn bộ điểm tích lũy của tất cả khách hàng đã được đặt về 0 để bắt đầu niên độ năm mới.",
-                    "Thông Báo",
+                    $"QUÀ ĐÃ HẾT TỒN KHO!\n\n" +
+                    $"Phần quà '{reward.Name}' đã hết trong kho quà (Tồn: 0 phần).\n" +
+                    $"Vui lòng nhập thêm tồn kho quà!",
+                    "Cảnh báo tồn kho",
                     MessageBoxButtons.OK,
-                    MessageBoxIcon.Information
+                    MessageBoxIcon.Error
                 );
+                return;
+            }
+
+            if (cust.Point < reward.PointsRequired)
+            {
+                MessageBox.Show(
+                    $"Không đủ điểm đổi quà!\n\n" +
+                    $"Khách hàng {cust.Name} có: {cust.Point} điểm.\n" +
+                    $"Cần: {reward.PointsRequired} điểm.",
+                    "Thông báo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+                return;
+            }
+
+            cust.Point -= reward.PointsRequired;
+            reward.StockQuantity -= 1;
+
+            txtEditPoint.Text = cust.Point.ToString();
+
+            DataManager.SaveCustomers(customers);
+            DataManager.SaveRewards(rewards);
+
+            ShowAllCustomers();
+            LoadLeaderboard();
+            CapNhatComboboxQua();
+            CapNhatBaoCaoThang();
+
+            MessageBox.Show(
+                $"ĐỔI QUÀ THÀNH CÔNG!\n\n" +
+                $"• Khách hàng: {cust.Name}\n" +
+                $"• Phần quà: {reward.Name}\n" +
+                $"• Đã trừ: -{reward.PointsRequired} điểm\n" +
+                $"• Số quà còn lại trong kho: {reward.StockQuantity} phần\n" +
+                $"• Điểm dư còn lại: {cust.Point} điểm",
+                "Thành công",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            );
+        }
+
+        private void btnManageRewards_Click(object sender, EventArgs e)
+        {
+            FormRewardManager rewardForm = new FormRewardManager(rewards, () =>
+            {
+                DataManager.SaveRewards(rewards);
+                CapNhatComboboxQua();
+                CapNhatBaoCaoThang();
+            });
+            rewardForm.ShowDialog();
+        }
+
+        // --- BÁO CÁO THỐNG KÊ THEO THÁNG & NĂM HIỆN TẠI ---
+        private void KhoiTaoComboboxBaoCao()
+        {
+            cboMonth.Items.Clear();
+            for (int m = 1; m <= 12; m++) cboMonth.Items.Add($"Tháng {m}");
+            cboMonth.SelectedIndex = DateTime.Now.Month - 1;
+
+            cboYear.Items.Clear();
+            int curYear = DateTime.Now.Year;
+            for (int y = curYear - 2; y <= curYear + 2; y++) cboYear.Items.Add(y.ToString());
+            cboYear.SelectedItem = curYear.ToString();
+        }
+
+        private void CapNhatBaoCaoThang()
+        {
+            if (cboMonth.SelectedIndex < 0 || cboYear.SelectedItem == null) return;
+
+            int selMonth = cboMonth.SelectedIndex + 1;
+            if (!int.TryParse(cboYear.SelectedItem.ToString(), out int selYear)) selYear = DateTime.Now.Year;
+
+            var dsHDLoc = invoices.Where(x => x.PurchaseDate.Month == selMonth && x.PurchaseDate.Year == selYear).ToList();
+
+            float tongDoanhThu = dsHDLoc.Sum(x => x.TotalAmount);
+            int tongSoLuongThuocBan = dsHDLoc.Sum(x => x.Items != null ? x.Items.Sum(i => i.Quantity) : 0);
+
+            // Top thuốc bán chạy
+            Dictionary<string, int> dictThuoc = new Dictionary<string, int>();
+            foreach (var inv in dsHDLoc)
+            {
+                if (inv.Items == null) continue;
+                foreach (var item in inv.Items)
+                {
+                    if (!dictThuoc.ContainsKey(item.Name)) dictThuoc[item.Name] = 0;
+                    dictThuoc[item.Name] += item.Quantity;
+                }
+            }
+            var topThuoc = dictThuoc.OrderByDescending(x => x.Value).Take(5).ToList();
+
+            // Điểm tích lũy KH
+            int tongDiemKH = customers.Sum(x => x.Point);
+            int t1 = customers.Count(x => x.Point < 50);
+            int t2 = customers.Count(x => x.Point >= 50 && x.Point < 150);
+            int t3 = customers.Count(x => x.Point >= 150 && x.Point < 300);
+            int t4 = customers.Count(x => x.Point >= 300);
+
+            int tongTonQua = rewards.Sum(x => x.StockQuantity);
+
+            rtbAnalytics.Clear();
+            rtbAnalytics.SelectionFont = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            rtbAnalytics.AppendText($"BÁO CÁO NHÀ THUỐC THÁNG {selMonth}/{selYear}\n");
+            rtbAnalytics.SelectionFont = new Font("Segoe UI", 9F, FontStyle.Regular);
+            rtbAnalytics.AppendText($"• Tổng doanh thu: {tongDoanhThu:N0}đ ({dsHDLoc.Count} đơn)\n");
+            rtbAnalytics.AppendText($"• Tổng số lượng thuốc đã bán: {tongSoLuongThuocBan} sản phẩm\n\n");
+
+            rtbAnalytics.SelectionFont = new Font("Segoe UI", 9F, FontStyle.Bold);
+            rtbAnalytics.AppendText("TOP THUỐC BÁN CHẠY NHẤT:\n");
+            rtbAnalytics.SelectionFont = new Font("Segoe UI", 8.5F, FontStyle.Regular);
+            if (topThuoc.Count == 0)
+            {
+                rtbAnalytics.AppendText("   (Chưa có dữ liệu bán thuốc tháng này)\n");
+            }
+            else
+            {
+                for (int i = 0; i < topThuoc.Count; i++)
+                {
+                    rtbAnalytics.AppendText($" #{i + 1} {topThuoc[i].Key}: {topThuoc[i].Value} sản phẩm\n");
+                }
+            }
+
+            rtbAnalytics.AppendText("\n");
+            rtbAnalytics.SelectionFont = new Font("Segoe UI", 9F, FontStyle.Bold);
+            rtbAnalytics.AppendText("PHÂN LỚP ĐIỂM KHÁCH HÀNG & QUÀ TẶNG:\n");
+            rtbAnalytics.SelectionFont = new Font("Segoe UI", 8.5F, FontStyle.Regular);
+            rtbAnalytics.AppendText($"• Tổng điểm tích lũy hiện có: {tongDiemKH} điểm ({customers.Count} KH)\n");
+            rtbAnalytics.AppendText($"• Mức <50đ: {t1} KH | 50-150đ: {t2} KH\n");
+            rtbAnalytics.AppendText($"• Mức 150-300đ: {t3} KH | >300đ: {t4} KH\n");
+            rtbAnalytics.AppendText($"• Tồn kho quà hiện tại: {tongTonQua} phần quà\n");
+
+            if (tongTonQua < (t2 + t3 + t4))
+            {
+                rtbAnalytics.SelectionFont = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+                rtbAnalytics.AppendText($"• CẢNH BÁO: Ước tính cần nhập thêm {(t2 + t3 + t4) - tongTonQua} quà để đáp ứng nhu cầu đổi điểm!");
+            }
+            else
+            {
+                rtbAnalytics.SelectionFont = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+                rtbAnalytics.AppendText("• Tồn kho quà đủ phục vụ khách đổi điểm!");
             }
         }
+
+        private void cboMonth_SelectedIndexChanged(object sender, EventArgs e) => CapNhatBaoCaoThang();
+        private void cboYear_SelectedIndexChanged(object sender, EventArgs e) => CapNhatBaoCaoThang();
+        private void btnRefreshAnalytics_Click(object sender, EventArgs e) => CapNhatBaoCaoThang();
     }
 }

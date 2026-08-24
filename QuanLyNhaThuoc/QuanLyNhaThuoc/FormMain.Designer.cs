@@ -1,16 +1,13 @@
+using System.Drawing;
+using System.Windows.Forms;
+using Font = System.Drawing.Font;
+
 namespace QuanLyNhaThuoc
 {
     partial class FormMain
     {
-        /// <summary>
-        ///  Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,22 +19,20 @@ namespace QuanLyNhaThuoc
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             pnlHeader = new Panel();
+            btnConfigRate = new Button();
             lblHeaderTitle = new Label();
             pnlCartBox = new Panel();
             products = new Label();
             proBox = new ComboBox();
+            lblUnit = new Label();
+            cboUnit = new ComboBox();
             lblQty = new Label();
             nudQuantity = new NumericUpDown();
             addProduct = new Button();
@@ -52,7 +47,6 @@ namespace QuanLyNhaThuoc
             grpCustInfo = new GroupBox();
             sdt = new Label();
             sdtBox = new TextBox();
-            find = new Button();
             name = new Label();
             nameBox = new TextBox();
             lblEditPoint = new Label();
@@ -70,12 +64,13 @@ namespace QuanLyNhaThuoc
             cboRewards = new ComboBox();
             lblRedeemNote = new Label();
             btnRedeemReward = new Button();
-            backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            contextMenuStrip1 = new ContextMenuStrip(components);
-            contextMenuStrip2 = new ContextMenuStrip(components);
-            contextMenuStrip3 = new ContextMenuStrip(components);
-            contextMenuStrip4 = new ContextMenuStrip(components);
-            contextMenuStrip5 = new ContextMenuStrip(components);
+            btnManageRewards = new Button();
+            tabAnalytics = new TabPage();
+            rtbAnalytics = new RichTextBox();
+            btnRefreshAnalytics = new Button();
+            cboYear = new ComboBox();
+            cboMonth = new ComboBox();
+            lblMonthFilter = new Label();
             pnlHeader.SuspendLayout();
             pnlCartBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudQuantity).BeginInit();
@@ -90,35 +85,53 @@ namespace QuanLyNhaThuoc
             tabLeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)leaderboard).BeginInit();
             tabRedeem.SuspendLayout();
+            tabAnalytics.SuspendLayout();
             SuspendLayout();
             // 
             // pnlHeader
             // 
-            pnlHeader.BackColor = Color.LightGray;
+            pnlHeader.BackColor = SystemColors.ControlLight;
+            pnlHeader.BorderStyle = BorderStyle.FixedSingle;
+            pnlHeader.Controls.Add(btnConfigRate);
             pnlHeader.Controls.Add(lblHeaderTitle);
             pnlHeader.Dock = DockStyle.Top;
             pnlHeader.Location = new Point(0, 0);
             pnlHeader.Name = "pnlHeader";
-            pnlHeader.Size = new Size(1120, 45);
+            pnlHeader.Size = new Size(1280, 50);
             pnlHeader.TabIndex = 0;
+            // 
+            // btnConfigRate
+            // 
+            btnConfigRate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnConfigRate.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnConfigRate.Location = new Point(1095, 10);
+            btnConfigRate.Name = "btnConfigRate";
+            btnConfigRate.Size = new Size(170, 30);
+            btnConfigRate.TabIndex = 1;
+            btnConfigRate.Text = "Đổi Tỷ Lệ Điểm";
+            btnConfigRate.UseVisualStyleBackColor = true;
+            btnConfigRate.Click += btnConfigRate_Click;
             // 
             // lblHeaderTitle
             // 
             lblHeaderTitle.AutoSize = true;
             lblHeaderTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblHeaderTitle.ForeColor = Color.Black;
-            lblHeaderTitle.Location = new Point(20, 10);
+            lblHeaderTitle.Location = new Point(20, 11);
             lblHeaderTitle.Name = "lblHeaderTitle";
-            lblHeaderTitle.Size = new Size(392, 21);
+            lblHeaderTitle.Size = new Size(490, 28);
             lblHeaderTitle.TabIndex = 0;
             lblHeaderTitle.Text = "HỆ THỐNG QUẢN LÝ NHÀ THUỐC & BÁN HÀNG POS";
             // 
             // pnlCartBox
             // 
+            pnlCartBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             pnlCartBox.BackColor = SystemColors.Control;
             pnlCartBox.BorderStyle = BorderStyle.FixedSingle;
             pnlCartBox.Controls.Add(products);
             pnlCartBox.Controls.Add(proBox);
+            pnlCartBox.Controls.Add(lblUnit);
+            pnlCartBox.Controls.Add(cboUnit);
             pnlCartBox.Controls.Add(lblQty);
             pnlCartBox.Controls.Add(nudQuantity);
             pnlCartBox.Controls.Add(addProduct);
@@ -126,7 +139,7 @@ namespace QuanLyNhaThuoc
             pnlCartBox.Controls.Add(pnlBillingSummary);
             pnlCartBox.Location = new Point(20, 60);
             pnlCartBox.Name = "pnlCartBox";
-            pnlCartBox.Size = new Size(670, 555);
+            pnlCartBox.Size = new Size(780, 640);
             pnlCartBox.TabIndex = 1;
             // 
             // products
@@ -135,66 +148,90 @@ namespace QuanLyNhaThuoc
             products.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             products.Location = new Point(15, 18);
             products.Name = "products";
-            products.Size = new Size(83, 17);
+            products.Size = new Size(99, 21);
             products.TabIndex = 0;
             products.Text = "Chọn thuốc:";
-            products.Click += label3_Click;
             // 
             // proBox
             // 
-            proBox.Font = new Font("Segoe UI", 10F);
+            proBox.Font = new Font("Segoe UI", 9.5F);
             proBox.FormattingEnabled = true;
-            proBox.Location = new Point(100, 14);
+            proBox.Location = new Point(115, 14);
             proBox.Name = "proBox";
-            proBox.Size = new Size(230, 25);
+            proBox.Size = new Size(240, 29);
             proBox.TabIndex = 1;
             proBox.TextChanged += proBox_TextChanged;
+            // 
+            // lblUnit
+            // 
+            lblUnit.AutoSize = true;
+            lblUnit.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblUnit.Location = new Point(365, 18);
+            lblUnit.Name = "lblUnit";
+            lblUnit.Size = new Size(44, 20);
+            lblUnit.TabIndex = 2;
+            lblUnit.Text = "ĐVT:";
+            // 
+            // cboUnit
+            // 
+            cboUnit.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboUnit.Font = new Font("Segoe UI", 9.5F);
+            cboUnit.FormattingEnabled = true;
+            cboUnit.Items.AddRange(new object[] { "Hộp", "Vỉ", "Viên" });
+            cboUnit.Location = new Point(410, 14);
+            cboUnit.Name = "cboUnit";
+            cboUnit.Size = new Size(80, 29);
+            cboUnit.TabIndex = 3;
             // 
             // lblQty
             // 
             lblQty.AutoSize = true;
-            lblQty.Font = new Font("Segoe UI", 9.5F);
-            lblQty.Location = new Point(345, 18);
+            lblQty.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblQty.Location = new Point(500, 18);
             lblQty.Name = "lblQty";
-            lblQty.Size = new Size(64, 17);
-            lblQty.TabIndex = 2;
-            lblQty.Text = "Số lượng:";
+            lblQty.Size = new Size(30, 20);
+            lblQty.TabIndex = 4;
+            lblQty.Text = "SL:";
             // 
             // nudQuantity
             // 
-            nudQuantity.Font = new Font("Segoe UI", 10F);
-            nudQuantity.Location = new Point(415, 15);
+            nudQuantity.Font = new Font("Segoe UI", 9.5F);
+            nudQuantity.Location = new Point(535, 14);
             nudQuantity.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             nudQuantity.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             nudQuantity.Name = "nudQuantity";
-            nudQuantity.Size = new Size(75, 25);
-            nudQuantity.TabIndex = 3;
+            nudQuantity.Size = new Size(70, 29);
+            nudQuantity.TabIndex = 5;
             nudQuantity.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // addProduct
             // 
+            addProduct.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             addProduct.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            addProduct.Location = new Point(505, 12);
+            addProduct.Location = new Point(620, 12);
             addProduct.Name = "addProduct";
-            addProduct.Size = new Size(148, 30);
-            addProduct.TabIndex = 4;
+            addProduct.Size = new Size(145, 33);
+            addProduct.TabIndex = 6;
             addProduct.Text = "Thêm Thuốc";
             addProduct.UseVisualStyleBackColor = true;
             addProduct.Click += addPro_Click;
             // 
             // menuPro
             // 
+            menuPro.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             menuPro.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             menuPro.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             menuPro.Location = new Point(15, 55);
             menuPro.Name = "menuPro";
             menuPro.ReadOnly = true;
+            menuPro.RowHeadersWidth = 51;
             menuPro.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            menuPro.Size = new Size(638, 370);
-            menuPro.TabIndex = 5;
+            menuPro.Size = new Size(750, 460);
+            menuPro.TabIndex = 7;
             // 
             // pnlBillingSummary
             // 
+            pnlBillingSummary.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             pnlBillingSummary.BackColor = SystemColors.Control;
             pnlBillingSummary.BorderStyle = BorderStyle.FixedSingle;
             pnlBillingSummary.Controls.Add(label2);
@@ -202,34 +239,32 @@ namespace QuanLyNhaThuoc
             pnlBillingSummary.Controls.Add(label3);
             pnlBillingSummary.Controls.Add(money);
             pnlBillingSummary.Controls.Add(calc);
-            pnlBillingSummary.Location = new Point(15, 435);
+            pnlBillingSummary.Location = new Point(15, 525);
             pnlBillingSummary.Name = "pnlBillingSummary";
-            pnlBillingSummary.Size = new Size(638, 105);
-            pnlBillingSummary.TabIndex = 6;
+            pnlBillingSummary.Size = new Size(750, 100);
+            pnlBillingSummary.TabIndex = 8;
             // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            label2.ForeColor = Color.DimGray;
+            label2.ForeColor = Color.Black;
             label2.Location = new Point(15, 18);
             label2.Name = "label2";
-            label2.Size = new Size(165, 17);
+            label2.Size = new Size(197, 21);
             label2.TabIndex = 0;
             label2.Text = "Điểm tích lũy nhận được:";
             // 
             // points
             // 
             points.AutoSize = true;
-            points.BackColor = Color.Black;
             points.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            points.ForeColor = Color.Lime;
-            points.Location = new Point(200, 12);
+            points.ForeColor = Color.Black;
+            points.Location = new Point(220, 12);
             points.Name = "points";
-            points.Size = new Size(23, 25);
+            points.Size = new Size(28, 32);
             points.TabIndex = 1;
             points.Text = "0";
-            points.Click += label4_Click;
             // 
             // label3
             // 
@@ -237,7 +272,7 @@ namespace QuanLyNhaThuoc
             label3.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             label3.Location = new Point(15, 55);
             label3.Name = "label3";
-            label3.Size = new Size(141, 20);
+            label3.Size = new Size(177, 25);
             label3.TabIndex = 2;
             label3.Text = "Tổng tiền hóa đơn:";
             // 
@@ -245,41 +280,42 @@ namespace QuanLyNhaThuoc
             // 
             money.AutoSize = true;
             money.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
-            money.ForeColor = Color.Red;
+            money.ForeColor = Color.Black;
             money.Location = new Point(195, 45);
             money.Name = "money";
-            money.Size = new Size(43, 32);
+            money.Size = new Size(54, 41);
             money.TabIndex = 3;
             money.Text = "0đ";
-            money.Click += label4_Click;
             // 
             // calc
             // 
+            calc.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             calc.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            calc.Location = new Point(390, 15);
+            calc.Location = new Point(500, 15);
             calc.Name = "calc";
-            calc.Size = new Size(230, 75);
+            calc.Size = new Size(235, 70);
             calc.TabIndex = 4;
-            calc.Text = "Tính Tiền";
+            calc.Text = "THANH TOÁN";
             calc.UseVisualStyleBackColor = true;
             calc.Click += calc_Click;
             // 
             // pnlCustomerBox
             // 
+            pnlCustomerBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             pnlCustomerBox.BackColor = SystemColors.Control;
             pnlCustomerBox.BorderStyle = BorderStyle.FixedSingle;
             pnlCustomerBox.Controls.Add(grpCustInfo);
             pnlCustomerBox.Controls.Add(grpCustTabs);
-            pnlCustomerBox.Location = new Point(710, 60);
+            pnlCustomerBox.Location = new Point(815, 60);
             pnlCustomerBox.Name = "pnlCustomerBox";
-            pnlCustomerBox.Size = new Size(390, 555);
+            pnlCustomerBox.Size = new Size(445, 640);
             pnlCustomerBox.TabIndex = 2;
             // 
             // grpCustInfo
             // 
+            grpCustInfo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             grpCustInfo.Controls.Add(sdt);
             grpCustInfo.Controls.Add(sdtBox);
-            grpCustInfo.Controls.Add(find);
             grpCustInfo.Controls.Add(name);
             grpCustInfo.Controls.Add(nameBox);
             grpCustInfo.Controls.Add(lblEditPoint);
@@ -287,9 +323,9 @@ namespace QuanLyNhaThuoc
             grpCustInfo.Controls.Add(btnUpdate);
             grpCustInfo.Controls.Add(register);
             grpCustInfo.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grpCustInfo.Location = new Point(15, 15);
+            grpCustInfo.Location = new Point(12, 12);
             grpCustInfo.Name = "grpCustInfo";
-            grpCustInfo.Size = new Size(358, 185);
+            grpCustInfo.Size = new Size(420, 185);
             grpCustInfo.TabIndex = 0;
             grpCustInfo.TabStop = false;
             grpCustInfo.Text = "1. Thông Tin Khách Hàng";
@@ -300,29 +336,19 @@ namespace QuanLyNhaThuoc
             sdt.Font = new Font("Segoe UI", 9F);
             sdt.Location = new Point(15, 30);
             sdt.Name = "sdt";
-            sdt.Size = new Size(79, 15);
+            sdt.Size = new Size(100, 20);
             sdt.TabIndex = 0;
             sdt.Text = "Số điện thoại:";
             // 
             // sdtBox
             // 
+            sdtBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             sdtBox.Font = new Font("Segoe UI", 9.5F);
-            sdtBox.Location = new Point(115, 26);
+            sdtBox.Location = new Point(120, 26);
             sdtBox.Name = "sdtBox";
-            sdtBox.Size = new Size(140, 24);
+            sdtBox.Size = new Size(280, 29);
             sdtBox.TabIndex = 1;
             sdtBox.TextChanged += sdtBox_TextChanged;
-            // 
-            // find
-            // 
-            find.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            find.Location = new Point(265, 25);
-            find.Name = "find";
-            find.Size = new Size(78, 27);
-            find.TabIndex = 2;
-            find.Text = "Tra cứu";
-            find.UseVisualStyleBackColor = true;
-            find.Click += find_Click;
             // 
             // name
             // 
@@ -330,17 +356,18 @@ namespace QuanLyNhaThuoc
             name.Font = new Font("Segoe UI", 9F);
             name.Location = new Point(15, 65);
             name.Name = "name";
-            name.Size = new Size(63, 15);
-            name.TabIndex = 3;
+            name.Size = new Size(76, 20);
+            name.TabIndex = 2;
             name.Text = "Họ và Tên:";
             // 
             // nameBox
             // 
+            nameBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             nameBox.Font = new Font("Segoe UI", 9.5F);
-            nameBox.Location = new Point(115, 61);
+            nameBox.Location = new Point(120, 61);
             nameBox.Name = "nameBox";
-            nameBox.Size = new Size(228, 24);
-            nameBox.TabIndex = 4;
+            nameBox.Size = new Size(280, 29);
+            nameBox.TabIndex = 3;
             nameBox.TextChanged += nameBox_TextChanged;
             // 
             // lblEditPoint
@@ -349,73 +376,79 @@ namespace QuanLyNhaThuoc
             lblEditPoint.Font = new Font("Segoe UI", 9F);
             lblEditPoint.Location = new Point(15, 100);
             lblEditPoint.Name = "lblEditPoint";
-            lblEditPoint.Size = new Size(86, 15);
-            lblEditPoint.TabIndex = 5;
+            lblEditPoint.Size = new Size(105, 20);
+            lblEditPoint.TabIndex = 4;
             lblEditPoint.Text = "Điểm Tích Lũy:";
             // 
             // txtEditPoint
             // 
-            txtEditPoint.Font = new Font("Segoe UI", 9.5F);
-            txtEditPoint.Location = new Point(115, 96);
+            txtEditPoint.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            txtEditPoint.ForeColor = Color.Black;
+            txtEditPoint.Location = new Point(120, 96);
             txtEditPoint.Name = "txtEditPoint";
-            txtEditPoint.Size = new Size(110, 24);
-            txtEditPoint.TabIndex = 6;
+            txtEditPoint.ReadOnly = true;
+            txtEditPoint.Size = new Size(130, 29);
+            txtEditPoint.TabIndex = 5;
             // 
             // btnUpdate
             // 
-            btnUpdate.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            btnUpdate.Location = new Point(233, 95);
+            btnUpdate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnUpdate.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+            btnUpdate.Location = new Point(260, 95);
             btnUpdate.Name = "btnUpdate";
-            btnUpdate.Size = new Size(110, 27);
-            btnUpdate.TabIndex = 7;
-            btnUpdate.Text = "Cập Nhật Điểm";
+            btnUpdate.Size = new Size(140, 30);
+            btnUpdate.TabIndex = 6;
+            btnUpdate.Text = "Sửa Tên/SĐT";
             btnUpdate.UseVisualStyleBackColor = true;
             btnUpdate.Click += btnUpdate_Click;
             // 
             // register
             // 
+            register.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             register.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             register.Location = new Point(15, 135);
             register.Name = "register";
-            register.Size = new Size(328, 34);
-            register.TabIndex = 8;
-            register.Text = "Đăng Ký Khách Mới";
+            register.Size = new Size(385, 35);
+            register.TabIndex = 7;
+            register.Text = "Đăng Ký Khách Hàng Mới";
             register.UseVisualStyleBackColor = true;
             register.Click += register_Click;
             // 
             // grpCustTabs
             // 
+            grpCustTabs.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             grpCustTabs.Controls.Add(tabCustomer);
             grpCustTabs.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grpCustTabs.Location = new Point(15, 210);
+            grpCustTabs.Location = new Point(12, 205);
             grpCustTabs.Name = "grpCustTabs";
-            grpCustTabs.Size = new Size(358, 330);
+            grpCustTabs.Size = new Size(420, 420);
             grpCustTabs.TabIndex = 1;
             grpCustTabs.TabStop = false;
-            grpCustTabs.Text = "2. Quản Lý Khách Hàng & VIP";
+            grpCustTabs.Text = "2. Quản Lý Khách Hàng & Báo Cáo";
             // 
             // tabCustomer
             // 
             tabCustomer.Controls.Add(tabList);
             tabCustomer.Controls.Add(tabLeader);
             tabCustomer.Controls.Add(tabRedeem);
+            tabCustomer.Controls.Add(tabAnalytics);
             tabCustomer.Dock = DockStyle.Fill;
             tabCustomer.Font = new Font("Segoe UI", 9F);
-            tabCustomer.Location = new Point(3, 20);
+            tabCustomer.Location = new Point(3, 25);
             tabCustomer.Name = "tabCustomer";
             tabCustomer.SelectedIndex = 0;
-            tabCustomer.Size = new Size(352, 307);
+            tabCustomer.Size = new Size(414, 392);
             tabCustomer.TabIndex = 0;
             // 
             // tabList
             // 
             tabList.Controls.Add(customer);
-            tabList.Location = new Point(4, 24);
+            tabList.Location = new Point(4, 29);
             tabList.Name = "tabList";
             tabList.Padding = new Padding(3);
-            tabList.Size = new Size(344, 279);
+            tabList.Size = new Size(406, 359);
             tabList.TabIndex = 0;
-            tabList.Text = "📋 Danh Sách Khách";
+            tabList.Text = "Danh Sách Khách";
             tabList.UseVisualStyleBackColor = true;
             // 
             // customer
@@ -442,20 +475,21 @@ namespace QuanLyNhaThuoc
             customer.Location = new Point(3, 3);
             customer.Name = "customer";
             customer.ReadOnly = true;
+            customer.RowHeadersWidth = 51;
             customer.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            customer.Size = new Size(338, 273);
+            customer.Size = new Size(400, 353);
             customer.TabIndex = 0;
             customer.CellClick += customer_CellClick;
             // 
             // tabLeader
             // 
             tabLeader.Controls.Add(leaderboard);
-            tabLeader.Location = new Point(4, 24);
+            tabLeader.Location = new Point(4, 29);
             tabLeader.Name = "tabLeader";
             tabLeader.Padding = new Padding(3);
-            tabLeader.Size = new Size(344, 279);
+            tabLeader.Size = new Size(406, 359);
             tabLeader.TabIndex = 1;
-            tabLeader.Text = "🏆 Top VIP";
+            tabLeader.Text = "Top VIP";
             tabLeader.UseVisualStyleBackColor = true;
             // 
             // leaderboard
@@ -482,8 +516,9 @@ namespace QuanLyNhaThuoc
             leaderboard.Location = new Point(3, 3);
             leaderboard.Name = "leaderboard";
             leaderboard.ReadOnly = true;
+            leaderboard.RowHeadersWidth = 51;
             leaderboard.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            leaderboard.Size = new Size(338, 273);
+            leaderboard.Size = new Size(400, 353);
             leaderboard.TabIndex = 0;
             // 
             // tabRedeem
@@ -492,12 +527,13 @@ namespace QuanLyNhaThuoc
             tabRedeem.Controls.Add(cboRewards);
             tabRedeem.Controls.Add(lblRedeemNote);
             tabRedeem.Controls.Add(btnRedeemReward);
-            tabRedeem.Location = new Point(4, 24);
+            tabRedeem.Controls.Add(btnManageRewards);
+            tabRedeem.Location = new Point(4, 29);
             tabRedeem.Name = "tabRedeem";
             tabRedeem.Padding = new Padding(10);
-            tabRedeem.Size = new Size(344, 279);
+            tabRedeem.Size = new Size(406, 359);
             tabRedeem.TabIndex = 2;
-            tabRedeem.Text = "🎁 Đổi Quà & Reset";
+            tabRedeem.Text = "Đổi Quà & Kho Quà";
             tabRedeem.UseVisualStyleBackColor = true;
             // 
             // lblChooseReward
@@ -506,18 +542,19 @@ namespace QuanLyNhaThuoc
             lblChooseReward.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             lblChooseReward.Location = new Point(10, 15);
             lblChooseReward.Name = "lblChooseReward";
-            lblChooseReward.Size = new Size(135, 15);
+            lblChooseReward.Size = new Size(171, 20);
             lblChooseReward.TabIndex = 0;
             lblChooseReward.Text = "Chọn phần quà quy đổi:";
             // 
             // cboRewards
             // 
+            cboRewards.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             cboRewards.DropDownStyle = ComboBoxStyle.DropDownList;
             cboRewards.Font = new Font("Segoe UI", 9.5F);
             cboRewards.FormattingEnabled = true;
-            cboRewards.Location = new Point(10, 35);
+            cboRewards.Location = new Point(10, 38);
             cboRewards.Name = "cboRewards";
-            cboRewards.Size = new Size(324, 25);
+            cboRewards.Size = new Size(385, 29);
             cboRewards.TabIndex = 1;
             // 
             // lblRedeemNote
@@ -525,60 +562,122 @@ namespace QuanLyNhaThuoc
             lblRedeemNote.AutoSize = true;
             lblRedeemNote.Font = new Font("Segoe UI", 8.5F, FontStyle.Italic);
             lblRedeemNote.ForeColor = Color.DimGray;
-            lblRedeemNote.Location = new Point(10, 68);
+            lblRedeemNote.Location = new Point(10, 75);
             lblRedeemNote.Name = "lblRedeemNote";
-            lblRedeemNote.Size = new Size(293, 15);
+            lblRedeemNote.Size = new Size(337, 20);
             lblRedeemNote.TabIndex = 2;
             lblRedeemNote.Text = "* Đổi quà cho khách hàng đang chọn (SĐT/Tên ở trên)";
             // 
             // btnRedeemReward
             // 
+            btnRedeemReward.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             btnRedeemReward.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            btnRedeemReward.Location = new Point(10, 92);
+            btnRedeemReward.Location = new Point(10, 105);
             btnRedeemReward.Name = "btnRedeemReward";
-            btnRedeemReward.Size = new Size(324, 38);
+            btnRedeemReward.Size = new Size(385, 42);
             btnRedeemReward.TabIndex = 3;
-            btnRedeemReward.Text = "🎁 Đổi Quà Ngay";
+            btnRedeemReward.Text = "ĐỔI QUÀ NGAY";
             btnRedeemReward.UseVisualStyleBackColor = true;
             btnRedeemReward.Click += btnRedeemReward_Click;
             // 
-            // contextMenuStrip1
+            // btnManageRewards
             // 
-            contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(61, 4);
+            btnManageRewards.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            btnManageRewards.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnManageRewards.Location = new Point(10, 160);
+            btnManageRewards.Name = "btnManageRewards";
+            btnManageRewards.Size = new Size(385, 42);
+            btnManageRewards.TabIndex = 4;
+            btnManageRewards.Text = "CẤU HÌNH & NHẬP THÊM TỒN KHO QUÀ";
+            btnManageRewards.UseVisualStyleBackColor = true;
+            btnManageRewards.Click += btnManageRewards_Click;
             // 
-            // contextMenuStrip2
+            // tabAnalytics
             // 
-            contextMenuStrip2.Name = "contextMenuStrip2";
-            contextMenuStrip2.Size = new Size(61, 4);
+            tabAnalytics.Controls.Add(rtbAnalytics);
+            tabAnalytics.Controls.Add(btnRefreshAnalytics);
+            tabAnalytics.Controls.Add(cboYear);
+            tabAnalytics.Controls.Add(cboMonth);
+            tabAnalytics.Controls.Add(lblMonthFilter);
+            tabAnalytics.Location = new Point(4, 29);
+            tabAnalytics.Name = "tabAnalytics";
+            tabAnalytics.Padding = new Padding(8);
+            tabAnalytics.Size = new Size(406, 359);
+            tabAnalytics.TabIndex = 3;
+            tabAnalytics.Text = "Báo Cáo Tháng";
+            tabAnalytics.UseVisualStyleBackColor = true;
             // 
-            // contextMenuStrip3
+            // rtbAnalytics
             // 
-            contextMenuStrip3.Name = "contextMenuStrip3";
-            contextMenuStrip3.Size = new Size(61, 4);
+            rtbAnalytics.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            rtbAnalytics.BackColor = Color.White;
+            rtbAnalytics.Font = new Font("Segoe UI", 9F);
+            rtbAnalytics.ForeColor = Color.Black;
+            rtbAnalytics.Location = new Point(8, 45);
+            rtbAnalytics.Name = "rtbAnalytics";
+            rtbAnalytics.ReadOnly = true;
+            rtbAnalytics.Size = new Size(388, 305);
+            rtbAnalytics.TabIndex = 4;
+            rtbAnalytics.Text = "";
             // 
-            // contextMenuStrip4
+            // btnRefreshAnalytics
             // 
-            contextMenuStrip4.Name = "contextMenuStrip4";
-            contextMenuStrip4.Size = new Size(61, 4);
+            btnRefreshAnalytics.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnRefreshAnalytics.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+            btnRefreshAnalytics.Location = new Point(305, 6);
+            btnRefreshAnalytics.Name = "btnRefreshAnalytics";
+            btnRefreshAnalytics.Size = new Size(92, 30);
+            btnRefreshAnalytics.TabIndex = 3;
+            btnRefreshAnalytics.Text = "Xem";
+            btnRefreshAnalytics.UseVisualStyleBackColor = true;
+            btnRefreshAnalytics.Click += btnRefreshAnalytics_Click;
             // 
-            // contextMenuStrip5
+            // cboYear
             // 
-            contextMenuStrip5.Name = "contextMenuStrip5";
-            contextMenuStrip5.Size = new Size(61, 4);
+            cboYear.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboYear.Font = new Font("Segoe UI", 8.5F);
+            cboYear.FormattingEnabled = true;
+            cboYear.Location = new Point(205, 8);
+            cboYear.Name = "cboYear";
+            cboYear.Size = new Size(90, 27);
+            cboYear.TabIndex = 2;
+            cboYear.SelectedIndexChanged += cboYear_SelectedIndexChanged;
+            // 
+            // cboMonth
+            // 
+            cboMonth.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboMonth.Font = new Font("Segoe UI", 8.5F);
+            cboMonth.FormattingEnabled = true;
+            cboMonth.Location = new Point(100, 8);
+            cboMonth.Name = "cboMonth";
+            cboMonth.Size = new Size(95, 27);
+            cboMonth.TabIndex = 1;
+            cboMonth.SelectedIndexChanged += cboMonth_SelectedIndexChanged;
+            // 
+            // lblMonthFilter
+            // 
+            lblMonthFilter.AutoSize = true;
+            lblMonthFilter.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+            lblMonthFilter.Location = new Point(8, 12);
+            lblMonthFilter.Name = "lblMonthFilter";
+            lblMonthFilter.Size = new Size(90, 19);
+            lblMonthFilter.TabIndex = 0;
+            lblMonthFilter.Text = "Tháng/Năm:";
             // 
             // FormMain
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(245, 247, 250);
-            ClientSize = new Size(1120, 640);
+            BackColor = SystemColors.Control;
+            ClientSize = new Size(1280, 720);
             Controls.Add(pnlCustomerBox);
             Controls.Add(pnlCartBox);
             Controls.Add(pnlHeader);
             Name = "FormMain";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "PHARMACY POS - HỆ THỐNG BÁN HÀNG & TÍCH ĐIỂM NHÀ THUỐC";
+            WindowState = FormWindowState.Maximized;
+            Load += FormMain_Load;
             pnlHeader.ResumeLayout(false);
             pnlHeader.PerformLayout();
             pnlCartBox.ResumeLayout(false);
@@ -598,6 +697,8 @@ namespace QuanLyNhaThuoc
             ((System.ComponentModel.ISupportInitialize)leaderboard).EndInit();
             tabRedeem.ResumeLayout(false);
             tabRedeem.PerformLayout();
+            tabAnalytics.ResumeLayout(false);
+            tabAnalytics.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -605,9 +706,12 @@ namespace QuanLyNhaThuoc
 
         private Panel pnlHeader;
         private Label lblHeaderTitle;
+        private Button btnConfigRate;
         private Panel pnlCartBox;
         private Label products;
         private ComboBox proBox;
+        private Label lblUnit;
+        private ComboBox cboUnit;
         private Label lblQty;
         private NumericUpDown nudQuantity;
         private Button addProduct;
@@ -622,7 +726,6 @@ namespace QuanLyNhaThuoc
         private GroupBox grpCustInfo;
         private Label sdt;
         private TextBox sdtBox;
-        private Button find;
         private Label name;
         private TextBox nameBox;
         private Label lblEditPoint;
@@ -640,11 +743,12 @@ namespace QuanLyNhaThuoc
         private ComboBox cboRewards;
         private Label lblRedeemNote;
         private Button btnRedeemReward;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private ContextMenuStrip contextMenuStrip1;
-        private ContextMenuStrip contextMenuStrip2;
-        private ContextMenuStrip contextMenuStrip3;
-        private ContextMenuStrip contextMenuStrip4;
-        private ContextMenuStrip contextMenuStrip5;
+        private Button btnManageRewards;
+        private TabPage tabAnalytics;
+        private Label lblMonthFilter;
+        private ComboBox cboMonth;
+        private ComboBox cboYear;
+        private Button btnRefreshAnalytics;
+        private RichTextBox rtbAnalytics;
     }
 }

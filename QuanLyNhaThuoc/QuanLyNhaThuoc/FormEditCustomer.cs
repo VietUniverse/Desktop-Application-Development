@@ -20,13 +20,13 @@ namespace QuanLyNhaThuoc
             txtPhone.Text = _customer.NumPhone;
             txtName.Text = _customer.Name;
             nudPoints.Value = _customer.Point;
+            nudPoints.Enabled = false; // Khóa sửa điểm thủ công: Điểm tích lũy chỉ được tính theo hóa đơn / đổi quà
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
             string newPhone = txtPhone.Text.Trim();
             string newName = txtName.Text.Trim();
-            int newPoints = (int)nudPoints.Value;
 
             if (string.IsNullOrWhiteSpace(newPhone))
             {
@@ -62,7 +62,6 @@ namespace QuanLyNhaThuoc
 
             _customer.NumPhone = newPhone;
             _customer.Name = newName;
-            _customer.Point = newPoints;
 
             DialogResult = DialogResult.OK;
             Close();

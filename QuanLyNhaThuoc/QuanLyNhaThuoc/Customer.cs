@@ -1,15 +1,17 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace QuanLyNhaThuoc
 {
     public class Customer
     {
+        [DisplayName("Họ Và Tên Khách Hàng")]
         public string Name { get; set; } = string.Empty;
+
+        [DisplayName("Số Điện Thoại")]
         public string NumPhone { get; set; } = string.Empty;
+
+        [DisplayName("Điểm Tích Lũy")]
         public int Point { get; set; }
 
         public Customer(string name, string nphone, int point)
