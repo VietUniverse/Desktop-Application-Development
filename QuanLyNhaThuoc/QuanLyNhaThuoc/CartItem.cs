@@ -47,18 +47,26 @@ namespace QuanLyNhaThuoc
         [DisplayName("Tồn Kho Quà")]
         public int StockQuantity { get; set; } = 20;
 
-        public RewardItem(string name, int pointsRequired, int stockQuantity = 20)
+        [DisplayName("Kích Hoạt")]
+        public bool IsActive { get; set; } = true;
+
+        [DisplayName("Trạng Thái")]
+        public string DisplayStatus => IsActive ? "Đang Kích Hoạt" : "Tạm Dừng";
+
+        public RewardItem(string name, int pointsRequired, int stockQuantity = 20, bool isActive = true)
         {
             Name = name;
             PointsRequired = pointsRequired;
             StockQuantity = stockQuantity;
+            IsActive = isActive;
         }
 
         public RewardItem() { }
 
         public override string ToString()
         {
-            return $"{Name} - {PointsRequired} điểm (Tồn: {StockQuantity} cái)";
+            string statusStr = IsActive ? "" : " [TẠM DỪNG]";
+            return $"{Name} - {PointsRequired} điểm (Tồn: {StockQuantity} cái){statusStr}";
         }
     }
 }

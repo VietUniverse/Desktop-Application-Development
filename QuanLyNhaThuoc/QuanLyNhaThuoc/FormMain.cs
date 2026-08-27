@@ -281,42 +281,11 @@ namespace QuanLyNhaThuoc
             string sdtStr = sdtBox.Text.Trim();
             string nameStr = nameBox.Text.Trim();
 
+            // Nếu không nhập SĐT hoặc Họ tên => Mặc định là Khách Vãng Lai
             if (string.IsNullOrWhiteSpace(sdtStr) || string.IsNullOrWhiteSpace(nameStr))
             {
-                FormCustomerChoice choiceForm = new FormCustomerChoice();
-                choiceForm.ShowDialog();
-
-                if (choiceForm.SelectedMode == CustomerChoiceMode.NewCustomer)
-                {
-                    string newSdt = Microsoft.VisualBasic.Interaction.InputBox("Nhập SỐ ĐIỆN THOẠI khách hàng mới:", "Đăng Ký Khách Mới", sdtStr);
-                    if (string.IsNullOrWhiteSpace(newSdt)) return;
-
-                    string newName = Microsoft.VisualBasic.Interaction.InputBox("Nhập HỌ VÀ TÊN khách hàng mới:", "Đăng Ký Khách Mới", nameStr);
-                    if (string.IsNullOrWhiteSpace(newName)) return;
-
-                    sdtBox.Text = newSdt;
-                    nameBox.Text = newName;
-                    sdtStr = newSdt.Trim();
-                    nameStr = newName.Trim();
-                }
-                else if (choiceForm.SelectedMode == CustomerChoiceMode.ExistingCustomer)
-                {
-                    tabCustomer.SelectedTab = tabList;
-                    MessageBox.Show("Vui lòng chọn khách hàng trong danh sách ở khung bên phải hoặc nhập SĐT!", "Hướng dẫn", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    sdtBox.Focus();
-                    return;
-                }
-                else if (choiceForm.SelectedMode == CustomerChoiceMode.GuestCheckout)
-                {
-                    sdtBox.Text = "0000000000";
-                    nameBox.Text = "Khách Vãng Lai";
-                    sdtStr = "0000000000";
-                    nameStr = "Khách Vãng Lai";
-                }
-                else
-                {
-                    return; // Cancel
-                }
+                sdtStr = "0000000000";
+                nameStr = "Khách Vãng Lai";
             }
 
             int newPoint = GetCurrentPoint();
@@ -690,8 +659,9 @@ namespace QuanLyNhaThuoc
 
         private void CapNhatComboboxQua()
         {
+            var activeRewards = rewards.Where(x => x.IsActive).ToList();
             cboRewards.DataSource = null;
-            cboRewards.DataSource = rewards;
+            cboRewards.DataSource = activeRewards;
             cboRewards.DisplayMember = "ToString";
             if (cboRewards.Items.Count > 0) cboRewards.SelectedIndex = 0;
         }
@@ -799,9 +769,14 @@ namespace QuanLyNhaThuoc
             rewardForm.ShowDialog();
         }
 
-        // --- BÁO CÁO THỐNG KÊ THEO THÁNG & NĂM HIỆN TẠI ---
+        // --- BÁO CÁO THỐNG KÊ THEO THÁNG & NĂM HOẶC KHOẢNG NĂM/GIAI ĐOẠN ---
         private void KhoiTaoComboboxBaoCao()
         {
+            if (cboReportType.Items.Count > 0 && cboReportType.SelectedIndex < 0)
+            {
+                cboReportType.SelectedIndex = 0;
+            }
+
             cboMonth.Items.Clear();
             for (int m = 1; m <= 12; m++) cboMonth.Items.Add($"Tháng {m}");
             cboMonth.SelectedIndex = DateTime.Now.Month - 1;
@@ -810,19 +785,72 @@ namespace QuanLyNhaThuoc
             int curYear = DateTime.Now.Year;
             for (int y = curYear - 2; y <= curYear + 2; y++) cboYear.Items.Add(y.ToString());
             cboYear.SelectedItem = curYear.ToString();
+
+            dtpFromDate.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            dtpToDate.Value = DateTime.Now;
         }
+
+        private void cboReportType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int mode = cboReportType.SelectedIndex;
+            bool isMonthMode = (mode == 0);
+            bool isRangeMode = (mode == 1);
+
+            cboMonth.Visible = isMonthMode;
+            cboYear.Visible = isMonthMode;
+
+            lblFromDate.Visible = isRangeMode;
+            dtpFromDate.Visible = isRangeMode;
+            lblToDate.Visible = isRangeMode;
+            dtpToDate.Visible = isRangeMode;
+
+            CapNhatBaoCaoThang();
+        }
+
+        private void dtpFromDate_ValueChanged(object sender, EventArgs e) => CapNhatBaoCaoThang();
+        private void dtpToDate_ValueChanged(object sender, EventArgs e) => CapNhatBaoCaoThang();
 
         private void CapNhatBaoCaoThang()
         {
-            if (cboMonth.SelectedIndex < 0 || cboYear.SelectedItem == null) return;
+            int reportMode = cboReportType.SelectedIndex < 0 ? 0 : cboReportType.SelectedIndex;
+            List<Invoice> dsHDLoc = new List<Invoice>();
+            string titleTimeStr = "";
 
-            int selMonth = cboMonth.SelectedIndex + 1;
-            if (!int.TryParse(cboYear.SelectedItem.ToString(), out int selYear)) selYear = DateTime.Now.Year;
+            if (reportMode == 0) // Theo Tháng / Năm
+            {
+                if (cboMonth.SelectedIndex < 0 || cboYear.SelectedItem == null) return;
+                int selMonth = cboMonth.SelectedIndex + 1;
+                if (!int.TryParse(cboYear.SelectedItem.ToString(), out int selYear)) selYear = DateTime.Now.Year;
 
-            var dsHDLoc = invoices.Where(x => x.PurchaseDate.Month == selMonth && x.PurchaseDate.Year == selYear).ToList();
+                dsHDLoc = invoices.Where(x => x.PurchaseDate.Month == selMonth && x.PurchaseDate.Year == selYear).ToList();
+                titleTimeStr = $"THÁNG {selMonth}/{selYear}";
+            }
+            else if (reportMode == 1) // Theo Giai Đoạn Khoảng Ngày
+            {
+                DateTime from = dtpFromDate.Value.Date;
+                DateTime to = dtpToDate.Value.Date;
+
+                if (from > to)
+                {
+                    rtbAnalytics.Clear();
+                    rtbAnalytics.SelectionFont = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+                    rtbAnalytics.AppendText("⚠️ LỖI CHỌN NGÀY: 'Từ ngày' không được lớn hơn 'Đến ngày'!");
+                    return;
+                }
+
+                dsHDLoc = invoices.Where(x => x.PurchaseDate.Date >= from && x.PurchaseDate.Date <= to).ToList();
+                titleTimeStr = $"GIAI ĐOẠN ({from:dd/MM/yyyy} - {to:dd/MM/yyyy})";
+            }
+            else // Tất cả thời gian
+            {
+                dsHDLoc = invoices.ToList();
+                titleTimeStr = "TẤT CẢ THỜI GIAN";
+            }
 
             float tongDoanhThu = dsHDLoc.Sum(x => x.TotalAmount);
             int tongSoLuongThuocBan = dsHDLoc.Sum(x => x.Items != null ? x.Items.Sum(i => i.Quantity) : 0);
+            float avgInvoiceValue = dsHDLoc.Count > 0 ? tongDoanhThu / dsHDLoc.Count : 0;
+            int tongDiemPhatSinh = (int)(tongDoanhThu / pointRate);
 
             // Top thuốc bán chạy
             Dictionary<string, int> dictThuoc = new Dictionary<string, int>();
@@ -848,17 +876,19 @@ namespace QuanLyNhaThuoc
 
             rtbAnalytics.Clear();
             rtbAnalytics.SelectionFont = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            rtbAnalytics.AppendText($"BÁO CÁO NHÀ THUỐC THÁNG {selMonth}/{selYear}\n");
+            rtbAnalytics.AppendText($"📊 BÁO CÁO THỐNG KÊ {titleTimeStr}\n");
             rtbAnalytics.SelectionFont = new Font("Segoe UI", 9F, FontStyle.Regular);
-            rtbAnalytics.AppendText($"• Tổng doanh thu: {tongDoanhThu:N0}đ ({dsHDLoc.Count} đơn)\n");
-            rtbAnalytics.AppendText($"• Tổng số lượng thuốc đã bán: {tongSoLuongThuocBan} sản phẩm\n\n");
+            rtbAnalytics.AppendText($"• Tổng doanh thu: {tongDoanhThu:N0}đ ({dsHDLoc.Count} hóa đơn)\n");
+            rtbAnalytics.AppendText($"• Giá trị trung bình/đơn: {avgInvoiceValue:N0}đ\n");
+            rtbAnalytics.AppendText($"• Số lượng thuốc đã bán: {tongSoLuongThuocBan} sản phẩm\n");
+            rtbAnalytics.AppendText($"• Điểm tích lũy phát sinh: {tongDiemPhatSinh} điểm\n\n");
 
             rtbAnalytics.SelectionFont = new Font("Segoe UI", 9F, FontStyle.Bold);
-            rtbAnalytics.AppendText("TOP THUỐC BÁN CHẠY NHẤT:\n");
+            rtbAnalytics.AppendText("🏆 TOP THUỐC BÁN CHẠY NHẤT GIAI ĐOẠN:\n");
             rtbAnalytics.SelectionFont = new Font("Segoe UI", 8.5F, FontStyle.Regular);
             if (topThuoc.Count == 0)
             {
-                rtbAnalytics.AppendText("   (Chưa có dữ liệu bán thuốc tháng này)\n");
+                rtbAnalytics.AppendText("   (Chưa có dữ liệu bán thuốc trong khoảng thời gian này)\n");
             }
             else
             {
@@ -870,9 +900,9 @@ namespace QuanLyNhaThuoc
 
             rtbAnalytics.AppendText("\n");
             rtbAnalytics.SelectionFont = new Font("Segoe UI", 9F, FontStyle.Bold);
-            rtbAnalytics.AppendText("PHÂN LỚP ĐIỂM KHÁCH HÀNG & QUÀ TẶNG:\n");
+            rtbAnalytics.AppendText("🎁 PHÂN LỚP ĐIỂM KHÁCH HÀNG & KHO QUÀ:\n");
             rtbAnalytics.SelectionFont = new Font("Segoe UI", 8.5F, FontStyle.Regular);
-            rtbAnalytics.AppendText($"• Tổng điểm tích lũy hiện có: {tongDiemKH} điểm ({customers.Count} KH)\n");
+            rtbAnalytics.AppendText($"• Tổng điểm hiện có hệ thống: {tongDiemKH} điểm ({customers.Count} KH)\n");
             rtbAnalytics.AppendText($"• Mức <50đ: {t1} KH | 50-150đ: {t2} KH\n");
             rtbAnalytics.AppendText($"• Mức 150-300đ: {t3} KH | >300đ: {t4} KH\n");
             rtbAnalytics.AppendText($"• Tồn kho quà hiện tại: {tongTonQua} phần quà\n");
@@ -880,7 +910,7 @@ namespace QuanLyNhaThuoc
             if (tongTonQua < (t2 + t3 + t4))
             {
                 rtbAnalytics.SelectionFont = new Font("Segoe UI", 8.5F, FontStyle.Bold);
-                rtbAnalytics.AppendText($"• CẢNH BÁO: Ước tính cần nhập thêm {(t2 + t3 + t4) - tongTonQua} quà để đáp ứng nhu cầu đổi điểm!");
+                rtbAnalytics.AppendText($"• CẢNH BÁO: Cần nhập thêm {(t2 + t3 + t4) - tongTonQua} quà để đủ đáp ứng nhu cầu đổi điểm!");
             }
             else
             {

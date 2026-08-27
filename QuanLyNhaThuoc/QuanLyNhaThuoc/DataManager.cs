@@ -29,7 +29,6 @@ namespace QuanLyNhaThuoc
 
         public static void GenerateRichSampleDataIfEmpty()
         {
-            // Tự động nạp dữ liệu mẫu phong phú nếu chưa có tệp dữ liệu hoặc tệp bị rỗng
             var customers = GetRichSampleCustomers();
             var medicines = GetRichSampleMedicines();
             var rewards = GetRichSampleRewards();
@@ -207,7 +206,7 @@ namespace QuanLyNhaThuoc
             catch { }
         }
 
-        // ===================== HÓA ĐƠN / LỊCH SỬ MUA HÀNG (40 Hóa Đơn Mẫu) =====================
+        // ===================== HÓA ĐƠN / LỊCH SỬ MUA HÀNG (85+ Hóa Đơn Mẫu Phong Phú) =====================
         public static List<Invoice> LoadInvoices()
         {
             try
@@ -216,7 +215,7 @@ namespace QuanLyNhaThuoc
                 {
                     string json = File.ReadAllText(InvoicesFile);
                     var list = JsonSerializer.Deserialize<List<Invoice>>(json, Options);
-                    if (list != null && list.Count >= 5) return list;
+                    if (list != null && list.Count >= 20) return list;
                 }
             }
             catch { }
@@ -226,32 +225,50 @@ namespace QuanLyNhaThuoc
             return defaultInvoices;
         }
 
-        private static List<Invoice> GetRichSampleInvoices()
+        public static List<Invoice> GetRichSampleInvoices()
         {
             List<Invoice> list = new List<Invoice>();
             DateTime now = DateTime.Now;
             var custs = GetRichSampleCustomers();
             var meds = GetRichSampleMedicines();
 
-            for (int i = 1; i <= 40; i++)
+            string[] units = { "Hộp", "Vỉ", "Viên" };
+            int invCounter = 1;
+
+            // Tạo 85+ hóa đơn cho 30 khách hàng trải dài 180 ngày gần đây
+            for (int i = 0; i < custs.Count; i++)
             {
-                var cust = custs[(i - 1) % custs.Count];
-                var m1 = meds[(i * 3) % meds.Count];
-                var m2 = meds[(i * 7) % meds.Count];
+                var cust = custs[i];
+                int invoiceCount = (i % 3) + 2; // Mỗi khách có 2-4 hóa đơn mẫu
 
-                int qty1 = (i % 3) + 1;
-                int qty2 = (i % 2) + 1;
+                for (int j = 0; j < invoiceCount; j++)
+                {
+                    int dayOffset = (i * 5 + j * 12) % 150;
+                    DateTime purchaseDate = now.AddDays(-dayOffset).AddHours(-((invCounter * 3) % 12));
 
-                float total = (m1.Price * qty1) + (m2.Price * qty2);
-                int points = (int)(total / 1000);
+                    string invId = "HD" + purchaseDate.ToString("yyyyMMdd") + invCounter.ToString("D3");
+                    invCounter++;
 
-                DateTime date = now.AddDays(-((i - 1) % 60)).AddHours(-((i * 4) % 12));
-                string invId = "HD" + date.ToString("yyyyMMdd") + i.ToString("D3");
+                    var m1 = meds[(i + j * 2) % meds.Count];
+                    var m2 = meds[(i * 3 + j * 4 + 1) % meds.Count];
 
-                CartItem item1 = new CartItem(m1.Name, m1.Price, qty1);
-                CartItem item2 = new CartItem(m2.Name, m2.Price, qty2);
+                    string u1 = units[j % units.Length];
+                    string u2 = units[(j + 1) % units.Length];
 
-                list.Add(new Invoice(invId, cust.NumPhone, cust.Name, date, new List<CartItem> { item1, item2 }, total, points));
+                    float p1 = m1.GetPriceByUnit(u1);
+                    float p2 = m2.GetPriceByUnit(u2);
+
+                    int qty1 = (j % 3) + 1;
+                    int qty2 = (i % 2) + 1;
+
+                    CartItem item1 = new CartItem(m1.Name, p1, qty1, u1);
+                    CartItem item2 = new CartItem(m2.Name, p2, qty2, u2);
+
+                    float totalAmount = item1.TotalPrice + item2.TotalPrice;
+                    int pointsEarned = (int)(totalAmount / 1000);
+
+                    list.Add(new Invoice(invId, cust.NumPhone, cust.Name, purchaseDate, new List<CartItem> { item1, item2 }, totalAmount, pointsEarned));
+                }
             }
 
             return list;

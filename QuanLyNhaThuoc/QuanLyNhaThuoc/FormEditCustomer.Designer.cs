@@ -2,15 +2,8 @@ namespace QuanLyNhaThuoc
 {
     partial class FormEditCustomer
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,95 +15,91 @@ namespace QuanLyNhaThuoc
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            lblTitle = new Label();
-            lblPhone = new Label();
-            txtPhone = new TextBox();
-            lblName = new Label();
-            txtName = new TextBox();
-            lblPoints = new Label();
-            nudPoints = new NumericUpDown();
-            btnSave = new Button();
-            btnCancel = new Button();
+            lblTitle = new System.Windows.Forms.Label();
+            lblPhone = new System.Windows.Forms.Label();
+            txtPhone = new System.Windows.Forms.TextBox();
+            lblName = new System.Windows.Forms.Label();
+            txtName = new System.Windows.Forms.TextBox();
+            lblPoints = new System.Windows.Forms.Label();
+            nudPoints = new System.Windows.Forms.NumericUpDown();
+            btnSave = new System.Windows.Forms.Button();
+            btnCancel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)nudPoints).BeginInit();
             SuspendLayout();
             // 
             // lblTitle
             // 
             lblTitle.AutoSize = true;
-            lblTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            lblTitle.Location = new Point(50, 15);
+            lblTitle.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            lblTitle.Location = new System.Drawing.Point(50, 18);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(265, 21);
+            lblTitle.Size = new System.Drawing.Size(380, 28);
             lblTitle.TabIndex = 0;
             lblTitle.Text = "CẬP NHẬT THÔNG TIN KHÁCH HÀNG";
             // 
             // lblPhone
             // 
             lblPhone.AutoSize = true;
-            lblPhone.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            lblPhone.Location = new Point(30, 60);
+            lblPhone.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            lblPhone.Location = new System.Drawing.Point(30, 68);
             lblPhone.Name = "lblPhone";
-            lblPhone.Size = new Size(94, 17);
+            lblPhone.Size = new System.Drawing.Size(115, 21);
             lblPhone.TabIndex = 1;
             lblPhone.Text = "Số điện thoại:";
             // 
             // txtPhone
             // 
-            txtPhone.Font = new Font("Segoe UI", 10F);
-            txtPhone.Location = new Point(135, 56);
+            txtPhone.Font = new System.Drawing.Font("Segoe UI", 10F);
+            txtPhone.Location = new System.Drawing.Point(150, 64);
             txtPhone.Name = "txtPhone";
-            txtPhone.Size = new Size(200, 25);
+            txtPhone.Size = new System.Drawing.Size(290, 30);
             txtPhone.TabIndex = 2;
             // 
             // lblName
             // 
             lblName.AutoSize = true;
-            lblName.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            lblName.Location = new Point(30, 105);
+            lblName.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            lblName.Location = new System.Drawing.Point(30, 118);
             lblName.Name = "lblName";
-            lblName.Size = new Size(72, 17);
+            lblName.Size = new System.Drawing.Size(88, 21);
             lblName.TabIndex = 3;
             lblName.Text = "Họ và Tên:";
             // 
             // txtName
             // 
-            txtName.Font = new Font("Segoe UI", 10F);
-            txtName.Location = new Point(135, 101);
+            txtName.Font = new System.Drawing.Font("Segoe UI", 10F);
+            txtName.Location = new System.Drawing.Point(150, 114);
             txtName.Name = "txtName";
-            txtName.Size = new Size(200, 25);
+            txtName.Size = new System.Drawing.Size(290, 30);
             txtName.TabIndex = 4;
             // 
             // lblPoints
             // 
             lblPoints.AutoSize = true;
-            lblPoints.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            lblPoints.Location = new Point(30, 150);
+            lblPoints.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            lblPoints.Location = new System.Drawing.Point(30, 168);
             lblPoints.Name = "lblPoints";
-            lblPoints.Size = new Size(99, 17);
+            lblPoints.Size = new System.Drawing.Size(113, 21);
             lblPoints.TabIndex = 5;
             lblPoints.Text = "Điểm tích lũy:";
             // 
             // nudPoints
             // 
-            nudPoints.Font = new Font("Segoe UI", 10F);
-            nudPoints.Location = new Point(135, 146);
+            nudPoints.Font = new System.Drawing.Font("Segoe UI", 10F);
+            nudPoints.Location = new System.Drawing.Point(150, 164);
             nudPoints.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
             nudPoints.Name = "nudPoints";
-            nudPoints.Size = new Size(200, 25);
+            nudPoints.Size = new System.Drawing.Size(290, 30);
             nudPoints.TabIndex = 6;
             // 
             // btnSave
             // 
-            btnSave.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            btnSave.Location = new Point(50, 195);
+            btnSave.Font = new System.Drawing.Font("Segoe UI", 9.5F, System.Drawing.FontStyle.Bold);
+            btnSave.Location = new System.Drawing.Point(80, 220);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(130, 35);
+            btnSave.Size = new System.Drawing.Size(150, 38);
             btnSave.TabIndex = 7;
             btnSave.Text = "Lưu Cập Nhật";
             btnSave.UseVisualStyleBackColor = true;
@@ -118,10 +107,10 @@ namespace QuanLyNhaThuoc
             // 
             // btnCancel
             // 
-            btnCancel.Font = new Font("Segoe UI", 9.5F);
-            btnCancel.Location = new Point(195, 195);
+            btnCancel.Font = new System.Drawing.Font("Segoe UI", 9.5F);
+            btnCancel.Location = new System.Drawing.Point(250, 220);
             btnCancel.Name = "btnCancel";
-            btnCancel.Size = new Size(130, 35);
+            btnCancel.Size = new System.Drawing.Size(150, 38);
             btnCancel.TabIndex = 8;
             btnCancel.Text = "Hủy Bỏ";
             btnCancel.UseVisualStyleBackColor = true;
@@ -129,9 +118,9 @@ namespace QuanLyNhaThuoc
             // 
             // FormEditCustomer
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(375, 255);
+            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(480, 280);
             Controls.Add(btnCancel);
             Controls.Add(btnSave);
             Controls.Add(nudPoints);
@@ -141,11 +130,11 @@ namespace QuanLyNhaThuoc
             Controls.Add(txtPhone);
             Controls.Add(lblPhone);
             Controls.Add(lblTitle);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FormEditCustomer";
-            StartPosition = FormStartPosition.CenterParent;
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "Cập Nhật Thông Tin Khách Hàng";
             ((System.ComponentModel.ISupportInitialize)nudPoints).EndInit();
             ResumeLayout(false);
@@ -154,14 +143,14 @@ namespace QuanLyNhaThuoc
 
         #endregion
 
-        private Label lblTitle;
-        private Label lblPhone;
-        private TextBox txtPhone;
-        private Label lblName;
-        private TextBox txtName;
-        private Label lblPoints;
-        private NumericUpDown nudPoints;
-        private Button btnSave;
-        private Button btnCancel;
+        private System.Windows.Forms.Label lblTitle;
+        private System.Windows.Forms.Label lblPhone;
+        private System.Windows.Forms.TextBox txtPhone;
+        private System.Windows.Forms.Label lblName;
+        private System.Windows.Forms.TextBox txtName;
+        private System.Windows.Forms.Label lblPoints;
+        private System.Windows.Forms.NumericUpDown nudPoints;
+        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnCancel;
     }
 }

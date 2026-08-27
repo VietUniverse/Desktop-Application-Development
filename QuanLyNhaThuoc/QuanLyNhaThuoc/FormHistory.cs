@@ -19,6 +19,9 @@ namespace QuanLyNhaThuoc
 
             lblCustomerInfo.Text = $"Khách hàng: {_customer.Name} | SĐT: {_customer.NumPhone} | Điểm hiện tại: {_customer.Point} điểm";
 
+            dtpFromDate.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            dtpToDate.Value = DateTime.Now;
+
             if (cboFilterType.Items.Count > 0)
             {
                 cboFilterType.SelectedIndex = 0;
@@ -35,18 +38,29 @@ namespace QuanLyNhaThuoc
                 .AsQueryable();
 
             int filterMode = cboFilterType.SelectedIndex;
-            DateTime selectedDate = dtpDate.Value;
 
-            if (filterMode == 1) // theo Ngày
+            if (filterMode == 1) // theo Giai Đoạn (Từ Ngày - Đến Ngày)
             {
-                customerInvoices = customerInvoices.Where(x => x.PurchaseDate.Date == selectedDate.Date);
+                DateTime from = dtpFromDate.Value.Date;
+                DateTime to = dtpToDate.Value.Date;
+                if (from <= to)
+                {
+                    customerInvoices = customerInvoices.Where(x => x.PurchaseDate.Date >= from && x.PurchaseDate.Date <= to);
+                }
             }
-            else if (filterMode == 2) // theo Tháng/Năm
+            else if (filterMode == 2) // theo Ngày chọn cụ thể
             {
+                DateTime selectedDate = dtpFromDate.Value.Date;
+                customerInvoices = customerInvoices.Where(x => x.PurchaseDate.Date == selectedDate);
+            }
+            else if (filterMode == 3) // theo Tháng/Năm
+            {
+                DateTime selectedDate = dtpFromDate.Value;
                 customerInvoices = customerInvoices.Where(x => x.PurchaseDate.Month == selectedDate.Month && x.PurchaseDate.Year == selectedDate.Year);
             }
-            else if (filterMode == 3) // theo Năm
+            else if (filterMode == 4) // theo Năm
             {
+                DateTime selectedDate = dtpFromDate.Value;
                 customerInvoices = customerInvoices.Where(x => x.PurchaseDate.Year == selectedDate.Year);
             }
 
@@ -75,7 +89,20 @@ namespace QuanLyNhaThuoc
 
         private void cboFilterType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            dtpDate.Enabled = cboFilterType.SelectedIndex > 0;
+            int mode = cboFilterType.SelectedIndex;
+            bool enableFrom = (mode > 0);
+            bool enableTo = (mode == 1);
+
+            lblFromDate.Visible = enableFrom;
+            dtpFromDate.Visible = enableFrom;
+            lblToDate.Visible = enableTo;
+            dtpToDate.Visible = enableTo;
+
+            if (mode == 2) lblFromDate.Text = "Ngày:";
+            else if (mode == 3) lblFromDate.Text = "Tháng:";
+            else if (mode == 4) lblFromDate.Text = "Năm:";
+            else lblFromDate.Text = "Từ:";
+
             ApplyHistoryFilter();
         }
 

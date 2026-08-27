@@ -44,10 +44,10 @@ namespace QuanLyNhaThuoc
             // lblTitle
             // 
             lblTitle.AutoSize = true;
-            lblTitle.Font = new Font("Segoe UI", 11.5F, FontStyle.Bold);
-            lblTitle.Location = new Point(15, 12);
+            lblTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblTitle.Location = new Point(40, 15);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(390, 28);
+            lblTitle.Size = new Size(460, 28);
             lblTitle.TabIndex = 0;
             lblTitle.Text = "CHI TIẾT & CHỈNH SỬA THUỐC TRONG ĐƠN HÀNG";
             // 
@@ -58,9 +58,9 @@ namespace QuanLyNhaThuoc
             grpMedInfo.Controls.Add(lblPriceInfo);
             grpMedInfo.Controls.Add(lblStockInfo);
             grpMedInfo.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grpMedInfo.Location = new Point(15, 45);
+            grpMedInfo.Location = new Point(18, 48);
             grpMedInfo.Name = "grpMedInfo";
-            grpMedInfo.Size = new Size(450, 150);
+            grpMedInfo.Size = new Size(504, 160);
             grpMedInfo.TabIndex = 1;
             grpMedInfo.TabStop = false;
             grpMedInfo.Text = "1. Thông Tin Chi Tiết Thuốc";
@@ -69,7 +69,7 @@ namespace QuanLyNhaThuoc
             // 
             lblMedName.AutoSize = true;
             lblMedName.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            lblMedName.Location = new Point(15, 25);
+            lblMedName.Location = new Point(15, 28);
             lblMedName.Name = "lblMedName";
             lblMedName.Size = new Size(95, 21);
             lblMedName.TabIndex = 0;
@@ -79,7 +79,7 @@ namespace QuanLyNhaThuoc
             // 
             lblManufacturer.AutoSize = true;
             lblManufacturer.Font = new Font("Segoe UI", 9F);
-            lblManufacturer.Location = new Point(15, 52);
+            lblManufacturer.Location = new Point(15, 58);
             lblManufacturer.Name = "lblManufacturer";
             lblManufacturer.Size = new Size(102, 20);
             lblManufacturer.TabIndex = 1;
@@ -89,7 +89,7 @@ namespace QuanLyNhaThuoc
             // 
             lblPriceInfo.AutoSize = true;
             lblPriceInfo.Font = new Font("Segoe UI", 9F);
-            lblPriceInfo.Location = new Point(15, 80);
+            lblPriceInfo.Location = new Point(15, 88);
             lblPriceInfo.Name = "lblPriceInfo";
             lblPriceInfo.Size = new Size(137, 20);
             lblPriceInfo.TabIndex = 2;
@@ -99,7 +99,7 @@ namespace QuanLyNhaThuoc
             // 
             lblStockInfo.AutoSize = true;
             lblStockInfo.Font = new Font("Segoe UI", 9F);
-            lblStockInfo.Location = new Point(15, 115);
+            lblStockInfo.Location = new Point(15, 122);
             lblStockInfo.Name = "lblStockInfo";
             lblStockInfo.Size = new Size(141, 20);
             lblStockInfo.TabIndex = 3;
@@ -114,9 +114,9 @@ namespace QuanLyNhaThuoc
             grpEditCart.Controls.Add(lblTotal);
             grpEditCart.Controls.Add(lblTotalPrice);
             grpEditCart.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grpEditCart.Location = new Point(15, 205);
+            grpEditCart.Location = new Point(18, 218);
             grpEditCart.Name = "grpEditCart";
-            grpEditCart.Size = new Size(450, 130);
+            grpEditCart.Size = new Size(504, 135);
             grpEditCart.TabIndex = 2;
             grpEditCart.TabStop = false;
             grpEditCart.Text = "2. Điều Chỉnh Số Lượng & Đơn Vị Tính";
@@ -125,7 +125,7 @@ namespace QuanLyNhaThuoc
             // 
             lblUnit.AutoSize = true;
             lblUnit.Font = new Font("Segoe UI", 9F);
-            lblUnit.Location = new Point(15, 32);
+            lblUnit.Location = new Point(15, 35);
             lblUnit.Name = "lblUnit";
             lblUnit.Size = new Size(91, 20);
             lblUnit.TabIndex = 0;
@@ -137,9 +137,9 @@ namespace QuanLyNhaThuoc
             cboUnit.Font = new Font("Segoe UI", 9.5F);
             cboUnit.FormattingEnabled = true;
             cboUnit.Items.AddRange(new object[] { "Hộp", "Vỉ", "Viên" });
-            cboUnit.Location = new Point(110, 28);
+            cboUnit.Location = new Point(115, 30);
             cboUnit.Name = "cboUnit";
-            cboUnit.Size = new Size(110, 29);
+            cboUnit.Size = new Size(120, 29);
             cboUnit.TabIndex = 1;
             cboUnit.SelectedIndexChanged += cboUnit_SelectedIndexChanged;
             // 
@@ -147,7 +147,7 @@ namespace QuanLyNhaThuoc
             // 
             lblQty.AutoSize = true;
             lblQty.Font = new Font("Segoe UI", 9F);
-            lblQty.Location = new Point(240, 32);
+            lblQty.Location = new Point(265, 35);
             lblQty.Name = "lblQty";
             lblQty.Size = new Size(72, 20);
             lblQty.TabIndex = 2;
@@ -156,11 +156,11 @@ namespace QuanLyNhaThuoc
             // nudQuantity
             // 
             nudQuantity.Font = new Font("Segoe UI", 9.5F);
-            nudQuantity.Location = new Point(320, 28);
+            nudQuantity.Location = new Point(345, 30);
             nudQuantity.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             nudQuantity.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             nudQuantity.Name = "nudQuantity";
-            nudQuantity.Size = new Size(110, 29);
+            nudQuantity.Size = new Size(135, 29);
             nudQuantity.TabIndex = 3;
             nudQuantity.Value = new decimal(new int[] { 1, 0, 0, 0 });
             nudQuantity.ValueChanged += nudQuantity_ValueChanged;
@@ -169,7 +169,7 @@ namespace QuanLyNhaThuoc
             // 
             lblTotal.AutoSize = true;
             lblTotal.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            lblTotal.Location = new Point(15, 80);
+            lblTotal.Location = new Point(15, 85);
             lblTotal.Name = "lblTotal";
             lblTotal.Size = new Size(174, 23);
             lblTotal.TabIndex = 4;
@@ -180,7 +180,7 @@ namespace QuanLyNhaThuoc
             lblTotalPrice.AutoSize = true;
             lblTotalPrice.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblTotalPrice.ForeColor = Color.Black;
-            lblTotalPrice.Location = new Point(195, 76);
+            lblTotalPrice.Location = new Point(200, 80);
             lblTotalPrice.Name = "lblTotalPrice";
             lblTotalPrice.Size = new Size(38, 28);
             lblTotalPrice.TabIndex = 5;
@@ -189,9 +189,9 @@ namespace QuanLyNhaThuoc
             // btnSave
             // 
             btnSave.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            btnSave.Location = new Point(15, 350);
+            btnSave.Location = new Point(18, 365);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(160, 36);
+            btnSave.Size = new Size(160, 40);
             btnSave.TabIndex = 3;
             btnSave.Text = "Lưu Thay Đổi";
             btnSave.UseVisualStyleBackColor = true;
@@ -200,9 +200,9 @@ namespace QuanLyNhaThuoc
             // btnDelete
             // 
             btnDelete.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            btnDelete.Location = new Point(185, 350);
+            btnDelete.Location = new Point(190, 365);
             btnDelete.Name = "btnDelete";
-            btnDelete.Size = new Size(150, 36);
+            btnDelete.Size = new Size(160, 40);
             btnDelete.TabIndex = 4;
             btnDelete.Text = "Xóa Khỏi Đơn";
             btnDelete.UseVisualStyleBackColor = true;
@@ -211,9 +211,9 @@ namespace QuanLyNhaThuoc
             // btnCancel
             // 
             btnCancel.Font = new Font("Segoe UI", 9.5F);
-            btnCancel.Location = new Point(345, 350);
+            btnCancel.Location = new Point(362, 365);
             btnCancel.Name = "btnCancel";
-            btnCancel.Size = new Size(120, 36);
+            btnCancel.Size = new Size(160, 40);
             btnCancel.TabIndex = 5;
             btnCancel.Text = "Hủy Bỏ";
             btnCancel.UseVisualStyleBackColor = true;
@@ -223,7 +223,7 @@ namespace QuanLyNhaThuoc
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(480, 400);
+            ClientSize = new Size(540, 420);
             Controls.Add(btnCancel);
             Controls.Add(btnDelete);
             Controls.Add(btnSave);

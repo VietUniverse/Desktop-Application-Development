@@ -32,13 +32,26 @@ namespace QuanLyNhaThuoc
             dt.Columns.Add("Tên Quà Tặng");
             dt.Columns.Add("Số Điểm Cần Đổi");
             dt.Columns.Add("Tồn Kho Hiện Tại");
-            dt.Columns.Add("Trạng Thái Tồn Kho");
+            dt.Columns.Add("Trạng Thái Kích Hoạt");
 
             for (int i = 0; i < _rewards.Count; i++)
             {
                 var r = _rewards[i];
-                string trangThai = r.StockQuantity <= 0 ? "HẾT KHO QUÀ" : "Còn hàng";
-                dt.Rows.Add(i + 1, r.Name, r.PointsRequired + " điểm", r.StockQuantity + " phần", trangThai);
+                string statusStr;
+                if (!r.IsActive)
+                {
+                    statusStr = "⛔ TẠM DỪNG";
+                }
+                else if (r.StockQuantity <= 0)
+                {
+                    statusStr = "⚠️ HẾT KHO QUÀ";
+                }
+                else
+                {
+                    statusStr = "✅ Đang Kích Hoạt";
+                }
+
+                dt.Rows.Add(i + 1, r.Name, r.PointsRequired + " điểm", r.StockQuantity + " phần", statusStr);
             }
 
             dgvRewards.DataSource = dt;
@@ -50,7 +63,7 @@ namespace QuanLyNhaThuoc
             }
             if (dgvRewards.Columns["Tên Quà Tặng"] != null)
             {
-                dgvRewards.Columns["Tên Quà Tặng"].Width = 250;
+                dgvRewards.Columns["Tên Quà Tặng"].Width = 230;
             }
             if (dgvRewards.Columns["Số Điểm Cần Đổi"] != null)
             {
@@ -59,6 +72,10 @@ namespace QuanLyNhaThuoc
             if (dgvRewards.Columns["Tồn Kho Hiện Tại"] != null)
             {
                 dgvRewards.Columns["Tồn Kho Hiện Tại"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
+            if (dgvRewards.Columns["Trạng Thái Kích Hoạt"] != null)
+            {
+                dgvRewards.Columns["Trạng Thái Kích Hoạt"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }
         }
 
@@ -109,11 +126,12 @@ namespace QuanLyNhaThuoc
                 {
                     existing.PointsRequired = points;
                     existing.StockQuantity = stock;
-                    MessageBox.Show($"Đã cập nhật quà '{name}' có sẵn trong hệ thống!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    existing.IsActive = true;
+                    MessageBox.Show($"Đã cập nhật & kích hoạt lại quà '{name}' có sẵn trong hệ thống!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    _rewards.Add(new RewardItem(name, points, stock));
+                    _rewards.Add(new RewardItem(name, points, stock, isActive: true));
                     MessageBox.Show($"Đã thêm phần quà mới '{name}' vào danh mục đổi quà!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
@@ -122,28 +140,23 @@ namespace QuanLyNhaThuoc
             HienThiDanhSachQua();
         }
 
-        private void btnDelete_Click(object sender, EventArgs e)
+        private void btnToggleActive_Click(object sender, EventArgs e)
         {
             string name = txtName.Text.Trim();
             if (string.IsNullOrWhiteSpace(name))
             {
-                MessageBox.Show("Vui lòng chọn quà cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn quà cần tạm dừng hoặc kích hoạt lại!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             RewardItem? target = _rewards.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
             if (target != null)
             {
-                var dr = MessageBox.Show($"Bạn có chắc chắn muốn xóa phần quà '{target.Name}'?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (dr == DialogResult.Yes)
-                {
-                    _rewards.Remove(target);
-                    _selectedReward = null;
-                    txtName.Text = "";
-                    _onDataChanged?.Invoke();
-                    HienThiDanhSachQua();
-                    MessageBox.Show("Đã xóa quà thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                target.IsActive = !target.IsActive;
+                string newStatusStr = target.IsActive ? "ĐANG KÍCH HOẠT" : "TẠM DỪNG";
+                MessageBox.Show($"Đã chuyển trạng thái phần quà '{target.Name}' sang: {newStatusStr}!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                _onDataChanged?.Invoke();
+                HienThiDanhSachQua();
             }
         }
 
