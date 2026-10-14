@@ -1,0 +1,33 @@
+[
+  {
+    "MSSV": "2010001",
+    "HoTenLot": "Huỳnh Kim",
+    "Ten": "Hùng",
+    "GioiTinh": true,
+    "NgaySinh": "2006-09-30T00:00:00",
+    "Lop": "CTK48",
+    "SoCMND": "123456789",
+    "SoDT": "0912345678",
+    "DiaChi": "43 Phù Đổng Thiên Vương, Đà Lạt",
+    "MonHocDangKy": [
+      "Mạng máy tính",
+      "Hệ điều hành",
+      "Lập trình CSDL"
+    ]
+  },
+  {
+    "MSSV": "2010002",
+    "HoTenLot": "Trần Thị Thanh",
+    "Ten": "Nga",
+    "GioiTinh": false,
+    "NgaySinh": "2005-08-20T00:00:00",
+    "Lop": "CTK47",
+    "SoCMND": "987654321",
+    "SoDT": "0987654321",
+    "DiaChi": "12 Đinh Tiên Hoàng, Đà Lạt",
+    "MonHocDangKy": [
+      "Phương pháp NCKH",
+      "Lập trình trên thiết bị di động"
+    ]
+  }
+]

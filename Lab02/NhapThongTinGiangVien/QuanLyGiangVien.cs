@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace NhapThongTinGiangVien
 {
+    // Kiểu tìm kiếm (Theo Mã, Theo Họ Tên, Theo Số ĐT)
     public enum KieuTim
     {
         TheoMa,
@@ -10,6 +11,7 @@ namespace NhapThongTinGiangVien
         TheoSoDT
     }
 
+    // Lớp quản lý danh sách giảng viên
     public class QuanLyGiangVien
     {
         public List<GiangVien> dsGiangVien { get; set; }
@@ -19,47 +21,58 @@ namespace NhapThongTinGiangVien
             dsGiangVien = new List<GiangVien>();
         }
 
+        // Thêm một giảng viên mới vào danh sách (trả về false nếu mã đã tồn tại)
         public bool Them(GiangVien gv)
         {
             foreach (GiangVien item in dsGiangVien)
             {
-                if (string.Equals(item.MaSo?.Trim(), gv.MaSo?.Trim(), StringComparison.OrdinalIgnoreCase))
+                // So sánh mã số (không phân biệt hoa/thường)
+                if (item.MaSo.Trim().Equals(gv.MaSo.Trim(), StringComparison.OrdinalIgnoreCase))
                 {
-                    return false; // Mã trùng
+                    return false; // Trùng mã giảng viên
                 }
             }
+
             dsGiangVien.Add(gv);
             return true;
         }
 
+        // Tìm kiếm giảng viên theo từ khóa và kiểu tìm
         public GiangVien? TimKiem(string tuKhoa, KieuTim kieu)
         {
             if (string.IsNullOrWhiteSpace(tuKhoa))
+            {
                 return null;
+            }
 
             tuKhoa = tuKhoa.Trim();
 
             foreach (GiangVien gv in dsGiangVien)
             {
-                switch (kieu)
+                if (kieu == KieuTim.TheoMa)
                 {
-                    case KieuTim.TheoMa:
-                        if (string.Equals(gv.MaSo?.Trim(), tuKhoa, StringComparison.OrdinalIgnoreCase))
-                            return gv;
-                        break;
-
-                    case KieuTim.TheoHoTen:
-                        if (gv.HoTen != null && gv.HoTen.IndexOf(tuKhoa, StringComparison.OrdinalIgnoreCase) >= 0)
-                            return gv;
-                        break;
-
-                    case KieuTim.TheoSoDT:
-                        if (gv.SoDT != null && gv.SoDT.Replace(".", "").Replace("(", "").Replace(")", "").Replace("-", "").Contains(tuKhoa.Replace(".", "").Replace("(", "").Replace(")", "").Replace("-", "")))
-                            return gv;
-                        break;
+                    if (gv.MaSo.Trim().Equals(tuKhoa, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return gv;
+                    }
+                }
+                else if (kieu == KieuTim.TheoHoTen)
+                {
+                    if (gv.HoTen.ToLower().Contains(tuKhoa.ToLower()))
+                    {
+                        return gv;
+                    }
+                }
+                else if (kieu == KieuTim.TheoSoDT)
+                {
+                    if (gv.SoDT.Contains(tuKhoa))
+                    {
+                        return gv;
+                    }
                 }
             }
-            return null;
+
+            return null; // Không tìm thấy
         }
     }
 }

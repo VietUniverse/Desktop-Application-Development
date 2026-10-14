@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace NhapThongTinGiangVien
@@ -12,54 +11,47 @@ namespace NhapThongTinGiangVien
         public frmGiangVien()
         {
             InitializeComponent();
-            CreateCancelIcon();
             qlgv = new QuanLyGiangVien();
-        }
-
-        private void CreateCancelIcon()
-        {
-            try
-            {
-                Bitmap bmp = new Bitmap(20, 20);
-                using (Graphics g = Graphics.FromImage(bmp))
-                {
-                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                    using (Brush b = new SolidBrush(Color.Red))
-                    {
-                        g.FillEllipse(b, 1, 1, 18, 18);
-                    }
-                    using (Pen p = new Pen(Color.White, 2.5f))
-                    {
-                        g.DrawLine(p, 6, 6, 14, 14);
-                        g.DrawLine(p, 14, 6, 6, 14);
-                    }
-                }
-                btnCancel.Image = bmp;
-                btnCancel.ImageAlign = ContentAlignment.MiddleLeft;
-                btnCancel.TextImageRelation = TextImageRelation.ImageBeforeText;
-            }
-            catch
-            {
-                // Do nothing
-            }
         }
 
         private GiangVien GetGiangVienFromForm()
         {
-            string gt = rdNam.Checked ? "Nam" : "Nữ";
-            List<string> listNn = new List<string>();
-            for (int i = 0; i < chklbNgoaiNgu.CheckedItems.Count; i++)
+            string gioiTinh = "Nữ";
+            if (rdNam.Checked)
             {
-                string? nn = chklbNgoaiNgu.CheckedItems[i]?.ToString();
-                if (!string.IsNullOrEmpty(nn))
-                    listNn.Add(nn);
+                gioiTinh = "Nam";
             }
 
-            DanhMucHocPhan dsHP = new DanhMucHocPhan();
-            foreach (var item in lbHocPhanDay.Items)
+            List<string> listNgoaiNgu = new List<string>();
+            foreach (object item in chklbNgoaiNgu.CheckedItems)
             {
                 if (item != null)
-                    dsHP.Them(new HocPhan(item.ToString() ?? ""));
+                {
+                    string? tenNgoaiNgu = item.ToString();
+                    if (tenNgoaiNgu != null)
+                    {
+                        listNgoaiNgu.Add(tenNgoaiNgu);
+                    }
+                }
+            }
+
+            DanhMucHocPhan dsHocPhan = new DanhMucHocPhan();
+            foreach (object item in lbHocPhanDay.Items)
+            {
+                if (item != null)
+                {
+                    string? tenHocPhan = item.ToString();
+                    if (tenHocPhan != null)
+                    {
+                        dsHocPhan.Them(new HocPhan(tenHocPhan));
+                    }
+                }
+            }
+
+            string[] ngoaiNgu = new string[listNgoaiNgu.Count];
+            for (int i = 0; i < listNgoaiNgu.Count; i++)
+            {
+                ngoaiNgu[i] = listNgoaiNgu[i];
             }
 
             return new GiangVien(
@@ -68,55 +60,59 @@ namespace NhapThongTinGiangVien
                 txtMail.Text,
                 txtHoTen.Text,
                 dtpNgaySinh.Value,
-                dsHP,
-                gt,
-                listNn.ToArray()
+                dsHocPhan,
+                gioiTinh,
+                ngoaiNgu
             );
         }
 
+        // Sự kiện khi Form tải lên
         private void frmGiangVien_Load(object sender, EventArgs e)
         {
             string lienHe = "https://cntt.dlu.edu.vn/";
             this.linklbLienHe.Links.Add(0, lienHe.Length, lienHe);
+
             if (this.cboMaSo.Items.Count > 0)
-                this.cboMaSo.SelectedItem = this.cboMaSo.Items[0];
+            {
+                this.cboMaSo.SelectedIndex = 0;
+            }
         }
 
+        // Chuyển học phần chọn từ ListBox danh sách sang ListBox môn dạy (Nút >>)
         private void btnChon_Click(object sender, EventArgs e)
         {
-            int i = this.lbDanhSachHP.SelectedItems.Count - 1;
-            while (i >= 0)
+            for (int i = lbDanhSachHP.SelectedItems.Count - 1; i >= 0; i--)
             {
-                var item = lbDanhSachHP.SelectedItems[i];
+                object? item = lbDanhSachHP.SelectedItems[i];
                 if (item != null)
                 {
-                    this.lbHocPhanDay.Items.Add(item);
-                    this.lbDanhSachHP.Items.Remove(item);
+                    lbHocPhanDay.Items.Add(item);
+                    lbDanhSachHP.Items.Remove(item);
                 }
-                i--;
             }
         }
 
+        // Chuyển học phần chọn từ ListBox môn dạy về ListBox danh sách (Nút <<)
         private void btnXoa_Click(object sender, EventArgs e)
         {
-            int i = this.lbHocPhanDay.SelectedItems.Count - 1;
-            while (i >= 0)
+            for (int i = lbHocPhanDay.SelectedItems.Count - 1; i >= 0; i--)
             {
-                var item = lbHocPhanDay.SelectedItems[i];
+                object? item = lbHocPhanDay.SelectedItems[i];
                 if (item != null)
                 {
-                    this.lbDanhSachHP.Items.Add(item);
-                    this.lbHocPhanDay.Items.Remove(item);
+                    lbDanhSachHP.Items.Add(item);
+                    lbHocPhanDay.Items.Remove(item);
                 }
-                i--;
             }
         }
 
+        // Thêm giảng viên vào danh sách
         private void btnThem_Click(object sender, EventArgs e)
         {
             GiangVien gv = GetGiangVienFromForm();
-            bool result = qlgv.Them(gv);
-            if (!result)
+            bool ketQua = qlgv.Them(gv);
+
+            if (!ketQua)
             {
                 MessageBox.Show("Mã giảng viên đã tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -126,6 +122,7 @@ namespace NhapThongTinGiangVien
             }
         }
 
+        // Mở Form tìm kiếm giảng viên
         private void btnTim_Click(object sender, EventArgs e)
         {
             using (frmSearchGiangVien frmSearch = new frmSearchGiangVien())
@@ -147,6 +144,7 @@ namespace NhapThongTinGiangVien
             }
         }
 
+        // Hiển thị thông báo thông tin giảng viên vừa nhập
         private void btnThongBao_Click(object sender, EventArgs e)
         {
             GiangVien gv = GetGiangVienFromForm();
@@ -155,15 +153,20 @@ namespace NhapThongTinGiangVien
             frmTB.ShowDialog();
         }
 
+        // Nút Hủy (Reset form)
         private void btnCancel_Click(object sender, EventArgs e)
         {
             this.ReSet();
         }
 
+        // Hàm xóa trắng và khôi phục form về mặc định
         private void ReSet()
         {
             if (cboMaSo.Items.Count > 0)
+            {
                 cboMaSo.SelectedIndex = 0;
+            }
+
             txtHoTen.Text = "";
             mtxtSoDT.Text = "";
             txtMail.Text = "";
@@ -171,37 +174,39 @@ namespace NhapThongTinGiangVien
             rdNam.Checked = true;
             rdNu.Checked = false;
 
+            // Bỏ chọn tất cả ngoại ngữ
             for (int i = 0; i < chklbNgoaiNgu.Items.Count; i++)
             {
                 chklbNgoaiNgu.SetItemChecked(i, false);
             }
 
-            foreach (var item in lbHocPhanDay.Items)
+            // Trả lại các môn dạy về danh sách ban đầu
+            foreach (object item in lbHocPhanDay.Items)
             {
                 lbDanhSachHP.Items.Add(item);
             }
             lbHocPhanDay.Items.Clear();
         }
 
+        // Nút Thoát
         private void btnExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
+        // Nhấp vào liên kết liên hệ
         private void linklbLienHe_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            string target = e.Link?.LinkData as string ?? "https://cntt.dlu.edu.vn/";
             try
             {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = target,
-                    UseShellExecute = true
-                });
+                System.Diagnostics.ProcessStartInfo thongTin = new System.Diagnostics.ProcessStartInfo();
+                thongTin.FileName = "https://cntt.dlu.edu.vn/";
+                thongTin.UseShellExecute = true;
+                System.Diagnostics.Process.Start(thongTin);
             }
             catch
             {
-                // Ignore if process fail
+                // Bỏ qua nếu không mở được trình duyệt
             }
         }
     }

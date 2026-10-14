@@ -3,12 +3,14 @@ using System.Windows.Forms;
 
 namespace QuanLyThongTinSinhVien
 {
+    // Loại tùy chọn (Sắp xếp hoặc Tìm kiếm)
     public enum LoaiTuyChon
     {
         SapXep,
         TimKiem
     }
 
+    // Tiêu chí áp dụng (Mã SV, Họ tên, Ngày sinh)
     public enum TieuChi
     {
         MaSV,
@@ -16,6 +18,7 @@ namespace QuanLyThongTinSinhVien
         NgaySinh
     }
 
+    // Form tùy chọn Sắp xếp / Tìm kiếm
     public partial class frmTuyChon : Form
     {
         public LoaiTuyChon CheDo { get; private set; }
@@ -26,6 +29,7 @@ namespace QuanLyThongTinSinhVien
         {
             InitializeComponent();
             this.CheDo = cheDo;
+
             if (cheDo == LoaiTuyChon.SapXep)
             {
                 this.Text = "Tùy chọn sắp xếp";
@@ -42,6 +46,7 @@ namespace QuanLyThongTinSinhVien
             }
         }
 
+        // Sự kiện khi nhấn nút Thực hiện (Sắp xếp / Tìm)
         private void btnThucHien_Click(object sender, EventArgs e)
         {
             if (CheDo == LoaiTuyChon.TimKiem && string.IsNullOrWhiteSpace(txtTuKhoa.Text))
@@ -52,12 +57,19 @@ namespace QuanLyThongTinSinhVien
 
             this.TuKhoa = txtTuKhoa.Text.Trim();
 
+            // Xác định tiêu chí được chọn
             if (rdMaSV.Checked)
+            {
                 this.TieuChiChon = TieuChi.MaSV;
+            }
             else if (rdHoTen.Checked)
+            {
                 this.TieuChiChon = TieuChi.HoTen;
+            }
             else if (rdNgaySinh.Checked)
+            {
                 this.TieuChiChon = TieuChi.NgaySinh;
+            }
 
             this.DialogResult = DialogResult.OK;
             this.Close();

@@ -1,0 +1,5 @@
+SV.00001	Nguyễn Văn Anh	15/05/2002	Đà Lạt	CTK34	SV.00001.jpg	Nam	Công nghệ phần mềm, Mạng truyền thông
+SV.00002	Trần Thị Bình	20/08/2003	Đức Trọng	CTK34	SV.00002.jpg	Nữ	Trí tuệ nhân tạo
+SV.00003	Lê Văn Cường	10/10/2002	Bảo Lộc	CTK33	SV.00003.jpg	Nam	Khoa học máy tính
+SV.00004	Phạm Hoàng Dũng	12/12/2001	Đơn Dương	CTK32	SV.00004.jpg	Nam	Hệ thống thông tin
+SV.00005	Võ Thị Em	01/01/2003	Đà Lạt	CTK34CD	SV.00005.jpg	Nữ	Tin học ứng dụng

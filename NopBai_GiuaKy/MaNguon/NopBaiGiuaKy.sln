@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chủ đề 2 - Quản lý sinh viên CNTT", "Chủ đề 2 - Quản lý sinh viên CNTT", "{98AE8853-27D1-2692-9DA7-3965AC83015E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuanLySinhVienCNTT", "ChuDe2_QuanLySinhVienCNTT\QuanLySinhVienCNTT.csproj", "{3CD3240D-03F3-4CAE-BBB2-80541C516073}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaiTap", "ChuDe3_BaiTap\BaiTap.csproj", "{847DE02E-7410-488A-853E-F5E075C84EEC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chủ đề 3", "Chủ đề 3", "{8499AE18-F9EB-0AD5-6532-E9DF66ABA816}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Debug|x64.Build.0 = Debug|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Debug|x86.Build.0 = Debug|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Release|x64.ActiveCfg = Release|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Release|x64.Build.0 = Release|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Release|x86.ActiveCfg = Release|Any CPU
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073}.Release|x86.Build.0 = Release|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Debug|x64.Build.0 = Debug|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Debug|x86.Build.0 = Debug|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Release|x64.ActiveCfg = Release|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Release|x64.Build.0 = Release|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Release|x86.ActiveCfg = Release|Any CPU
+		{847DE02E-7410-488A-853E-F5E075C84EEC}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3CD3240D-03F3-4CAE-BBB2-80541C516073} = {98AE8853-27D1-2692-9DA7-3965AC83015E}
+		{847DE02E-7410-488A-853E-F5E075C84EEC} = {8499AE18-F9EB-0AD5-6532-E9DF66ABA816}
+	EndGlobalSection
+EndGlobal

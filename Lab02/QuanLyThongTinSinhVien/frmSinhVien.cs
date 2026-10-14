@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -16,38 +15,42 @@ namespace QuanLyThongTinSinhVien
             qlsv = new QuanLySinhVien();
         }
 
-        #region Phương thức bổ trợ
-
+        // Cập nhật số lượng sinh viên trên thanh trạng thái (StatusStrip)
         private void CapNhatStatusStrip()
         {
             this.toolStripStatusLabelTongSV.Text = "Tổng số sinh viên: " + this.lvSinhVien.Items.Count;
         }
 
+        // Lấy dữ liệu từ toàn bộ Form để tạo đối tượng SinhVien mới
         private SinhVien GetSinhVienToanForm()
         {
             SinhVien sv = new SinhVien();
-            sv.MaSo = this.mtxtMaSo.Text;
-            sv.HoTen = this.txtHoTen.Text;
+            sv.MaSo = this.mtxtMaSo.Text.Trim();
+            sv.HoTen = this.txtHoTen.Text.Trim();
             sv.NgaySinh = this.dtpNgaySinh.Value;
-            sv.DiaChi = this.txtDiaChi.Text;
-            sv.Lop = this.cboLop.Text;
-            sv.Hinh = this.txtHinh.Text;
+            sv.DiaChi = this.txtDiaChi.Text.Trim();
+            sv.Lop = this.cboLop.Text.Trim();
+            sv.Hinh = this.txtHinh.Text.Trim();
             sv.GioiTinh = this.rdNam.Checked;
 
+            // Lấy danh sách các chuyên ngành được tích chọn
             List<string> cn = new List<string>();
             for (int i = 0; i < this.clbChuyenNganh.Items.Count; i++)
             {
                 if (this.clbChuyenNganh.GetItemChecked(i))
                 {
-                    string? itemStr = this.clbChuyenNganh.Items[i]?.ToString();
+                    string? itemStr = this.clbChuyenNganh.Items[i].ToString();
                     if (!string.IsNullOrEmpty(itemStr))
+                    {
                         cn.Add(itemStr);
+                    }
                 }
             }
             sv.ChuyenNganh = cn;
             return sv;
         }
 
+        // Lấy thông tin sinh viên từ dòng đang được chọn trong ListView
         private SinhVien GetSinhVienLV(ListViewItem item)
         {
             SinhVien sv = new SinhVien();
@@ -66,7 +69,7 @@ namespace QuanLyThongTinSinhVien
 
             sv.DiaChi = item.SubItems[3].Text;
             sv.Lop = item.SubItems[4].Text;
-            sv.GioiTinh = item.SubItems[5].Text == "Nam";
+            sv.GioiTinh = (item.SubItems[5].Text == "Nam");
 
             string[] cn = item.SubItems[6].Text.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (string c in cn)
@@ -78,6 +81,7 @@ namespace QuanLyThongTinSinhVien
             return sv;
         }
 
+        // Hiển thị thông tin đối tượng SinhVien lên các điều khiển trên Form
         private void ThietLapThongTin(SinhVien sv)
         {
             this.mtxtMaSo.Text = sv.MaSo;
@@ -95,26 +99,37 @@ namespace QuanLyThongTinSinhVien
             {
                 string relativePath = Path.Combine(Application.StartupPath, sv.Hinh);
                 if (File.Exists(relativePath))
+                {
                     this.pbHinh.ImageLocation = relativePath;
+                }
                 else
+                {
                     this.pbHinh.Image = null;
+                }
             }
 
             if (sv.GioiTinh)
+            {
                 this.rdNam.Checked = true;
+            }
             else
+            {
                 this.rdNu.Checked = true;
+            }
 
+            // Đặt lại các checkbox chuyên ngành
             for (int i = 0; i < this.clbChuyenNganh.Items.Count; i++)
             {
                 this.clbChuyenNganh.SetItemChecked(i, false);
             }
 
+            // Tích chọn lại các chuyên ngành của sinh viên
             foreach (string cn in sv.ChuyenNganh)
             {
                 for (int i = 0; i < this.clbChuyenNganh.Items.Count; i++)
                 {
-                    if (this.clbChuyenNganh.Items[i]?.ToString() == cn)
+                    string? tenChuyenNganh = this.clbChuyenNganh.Items[i].ToString();
+                    if (tenChuyenNganh == cn)
                     {
                         this.clbChuyenNganh.SetItemChecked(i, true);
                     }
@@ -122,6 +137,7 @@ namespace QuanLyThongTinSinhVien
             }
         }
 
+        // Thêm một dòng sinh viên vào ListView
         private void ThemSV(SinhVien sv)
         {
             ListViewItem item = new ListViewItem(sv.MaSo);
@@ -129,13 +145,19 @@ namespace QuanLyThongTinSinhVien
             item.SubItems.Add(sv.NgaySinh.ToString("dd/MM/yyyy"));
             item.SubItems.Add(sv.DiaChi);
             item.SubItems.Add(sv.Lop);
-            item.SubItems.Add(sv.GioiTinh ? "Nam" : "Nữ");
+            string gioiTinh = "Nữ";
+            if (sv.GioiTinh)
+            {
+                gioiTinh = "Nam";
+            }
+            item.SubItems.Add(gioiTinh);
             item.SubItems.Add(string.Join(", ", sv.ChuyenNganh));
             item.SubItems.Add(sv.Hinh);
 
             this.lvSinhVien.Items.Add(item);
         }
 
+        // Đổ lại toàn bộ danh sách sinh viên từ bộ nhớ lên ListView
         private void LoadListView()
         {
             this.lvSinhVien.Items.Clear();
@@ -146,6 +168,7 @@ namespace QuanLyThongTinSinhVien
             CapNhatStatusStrip();
         }
 
+        // Xóa trắng form nhập liệu
         private void ResetControls()
         {
             this.mtxtMaSo.Text = "";
@@ -153,7 +176,9 @@ namespace QuanLyThongTinSinhVien
             this.dtpNgaySinh.Value = DateTime.Now;
             this.txtDiaChi.Text = "";
             if (this.cboLop.Items.Count > 0)
+            {
                 this.cboLop.SelectedIndex = 0;
+            }
             this.txtHinh.Text = "";
             this.pbHinh.Image = null;
             this.rdNam.Checked = true;
@@ -164,25 +189,13 @@ namespace QuanLyThongTinSinhVien
             }
         }
 
-        private int SoSanhTheoMa(object a, object b)
-        {
-            SinhVien? sv = b as SinhVien;
-            string? ma = a as string;
-            if (sv != null && ma != null)
-            {
-                return string.Compare(ma.Trim(), sv.MaSo.Trim(), StringComparison.OrdinalIgnoreCase);
-            }
-            return -1;
-        }
-
-        #endregion
-
-        #region Event Handlers
-
+        // Sự kiện khi tải Form
         private void frmSinhVien_Load(object sender, EventArgs e)
         {
             if (this.cboLop.Items.Count > 0)
+            {
                 this.cboLop.SelectedIndex = 0;
+            }
 
             string filePath = "DanhSachSV.txt";
             if (!File.Exists(filePath))
@@ -197,6 +210,7 @@ namespace QuanLyThongTinSinhVien
             }
         }
 
+        // Khi chọn một sinh viên trên ListView
         private void lvSinhVien_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (this.lvSinhVien.SelectedItems.Count > 0)
@@ -207,6 +221,7 @@ namespace QuanLyThongTinSinhVien
             }
         }
 
+        // Chọn file ảnh đại diện
         private void btnBrowse_Click(object sender, EventArgs e)
         {
             if (this.openFileDialogHinh.ShowDialog() == DialogResult.OK)
@@ -216,10 +231,19 @@ namespace QuanLyThongTinSinhVien
             }
         }
 
+        // Nút Thêm sinh viên
         private void btnThem_Click(object sender, EventArgs e)
         {
             SinhVien sv = GetSinhVienToanForm();
-            SinhVien? tim = qlsv.Tim(sv.MaSo, SoSanhTheoMa);
+
+            if (string.IsNullOrWhiteSpace(sv.MaSo))
+            {
+                MessageBox.Show("Vui lòng nhập mã sinh viên!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Kiểm tra trùng mã sinh viên
+            SinhVien? tim = qlsv.TimTheoMa(sv.MaSo);
             if (tim != null)
             {
                 MessageBox.Show("Mã sinh viên đã tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -230,6 +254,7 @@ namespace QuanLyThongTinSinhVien
             LoadListView();
         }
 
+        // Nút Xóa các sinh viên được tích chọn trong danh sách
         private void btnXoa_Click(object sender, EventArgs e)
         {
             int count = this.lvSinhVien.CheckedItems.Count;
@@ -243,17 +268,19 @@ namespace QuanLyThongTinSinhVien
             {
                 ListViewItem item = this.lvSinhVien.CheckedItems[i];
                 string maSo = item.SubItems[0].Text;
-                qlsv.Xoa(maSo, SoSanhTheoMa);
+                qlsv.XoaTheoMa(maSo);
             }
 
             LoadListView();
             ResetControls();
         }
 
+        // Nút Sửa thông tin sinh viên
         private void btnSua_Click(object sender, EventArgs e)
         {
             SinhVien sv = GetSinhVienToanForm();
-            bool kq = qlsv.Sua(sv, sv.MaSo, SoSanhTheoMa);
+            bool kq = qlsv.Sua(sv);
+
             if (kq)
             {
                 LoadListView();
@@ -265,16 +292,19 @@ namespace QuanLyThongTinSinhVien
             }
         }
 
+        // Nút Mặc định (Reset form)
         private void btnMacDinh_Click(object sender, EventArgs e)
         {
             ResetControls();
         }
 
+        // Nút Thoát
         private void btnThoat_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
+        // Đổi font chữ của ListView
         private void tsmiFont_Click(object sender, EventArgs e)
         {
             if (fontDialog1.ShowDialog() == DialogResult.OK)
@@ -283,6 +313,7 @@ namespace QuanLyThongTinSinhVien
             }
         }
 
+        // Đổi màu chữ của ListView
         private void tsmiColor_Click(object sender, EventArgs e)
         {
             if (colorDialog1.ShowDialog() == DialogResult.OK)
@@ -291,29 +322,20 @@ namespace QuanLyThongTinSinhVien
             }
         }
 
+        // Menu Sắp xếp danh sách
         private void tsmiSort_Click(object sender, EventArgs e)
         {
             using (frmTuyChon frm = new frmTuyChon(LoaiTuyChon.SapXep))
             {
                 if (frm.ShowDialog() == DialogResult.OK)
                 {
-                    switch (frm.TieuChiChon)
-                    {
-                        case TieuChi.MaSV:
-                            qlsv.DanhSach.Sort((a, b) => string.Compare(a.MaSo, b.MaSo));
-                            break;
-                        case TieuChi.HoTen:
-                            qlsv.DanhSach.Sort((a, b) => string.Compare(a.HoTen, b.HoTen));
-                            break;
-                        case TieuChi.NgaySinh:
-                            qlsv.DanhSach.Sort((a, b) => DateTime.Compare(a.NgaySinh, b.NgaySinh));
-                            break;
-                    }
+                    qlsv.SapXep(frm.TieuChiChon);
                     LoadListView();
                 }
             }
         }
 
+        // Menu Tìm kiếm sinh viên
         private void tsmiSearch_Click(object sender, EventArgs e)
         {
             using (frmTuyChon frm = new frmTuyChon(LoaiTuyChon.TimKiem))
@@ -321,24 +343,30 @@ namespace QuanLyThongTinSinhVien
                 if (frm.ShowDialog() == DialogResult.OK)
                 {
                     List<SinhVien> ketQua = new List<SinhVien>();
-                    string kw = frm.TuKhoa;
+                    string kw = frm.TuKhoa.ToLower();
 
                     foreach (SinhVien sv in qlsv.DanhSach)
                     {
-                        switch (frm.TieuChiChon)
+                        if (frm.TieuChiChon == TieuChi.MaSV)
                         {
-                            case TieuChi.MaSV:
-                                if (sv.MaSo != null && sv.MaSo.IndexOf(kw, StringComparison.OrdinalIgnoreCase) >= 0)
-                                    ketQua.Add(sv);
-                                break;
-                            case TieuChi.HoTen:
-                                if (sv.HoTen != null && sv.HoTen.IndexOf(kw, StringComparison.OrdinalIgnoreCase) >= 0)
-                                    ketQua.Add(sv);
-                                break;
-                            case TieuChi.NgaySinh:
-                                if (sv.NgaySinh.ToString("dd/MM/yyyy").Contains(kw))
-                                    ketQua.Add(sv);
-                                break;
+                            if (sv.MaSo.ToLower().Contains(kw))
+                            {
+                                ketQua.Add(sv);
+                            }
+                        }
+                        else if (frm.TieuChiChon == TieuChi.HoTen)
+                        {
+                            if (sv.HoTen.ToLower().Contains(kw))
+                            {
+                                ketQua.Add(sv);
+                            }
+                        }
+                        else if (frm.TieuChiChon == TieuChi.NgaySinh)
+                        {
+                            if (sv.NgaySinh.ToString("dd/MM/yyyy").Contains(kw))
+                            {
+                                ketQua.Add(sv);
+                            }
                         }
                     }
 
@@ -356,7 +384,5 @@ namespace QuanLyThongTinSinhVien
                 }
             }
         }
-
-        #endregion
     }
 }

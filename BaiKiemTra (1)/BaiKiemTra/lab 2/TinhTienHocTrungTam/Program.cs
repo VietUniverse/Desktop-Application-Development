@@ -1,0 +1,18 @@
+﻿namespace TinhTienHocTrungTam
+{
+    internal static class Program
+    {
+        /// <summary>
+        ///  The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            // To customize application configuration such as set high DPI settings or default font,
+            // see https://aka.ms/applicationconfiguration.
+            ApplicationConfiguration.Initialize();
+            Application.Run(new frmTrungTam()); //Thiếu 1 dòng code sẽ không hoạt động
+            //Phần này nhớ học thuộc
+        }
+    }
+}

@@ -11,12 +11,6 @@ namespace NhapThongTinGiangVien
             ds = new List<HocPhan>();
         }
 
-        public HocPhan this[int index]
-        {
-            get { return ds[index]; }
-            set { ds[index] = value; }
-        }
-
         public void Them(HocPhan hp)
         {
             ds.Add(hp);
